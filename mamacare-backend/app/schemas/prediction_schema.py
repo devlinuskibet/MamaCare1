@@ -12,4 +12,5 @@ class PredictionInput(BaseModel):
 class PredictionOutput(BaseModel):
     risk_level: str
     confidence_score: float
-    timestamp: str
+    timestamp: str  
+    

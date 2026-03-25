@@ -14,23 +14,26 @@ def predict_risk(data: PredictionInput):
     """
     Accepts health metrics and returns maternal risk classification.
     """
-    # 1. Prepare data for the service
-    # The order MUST match how the model was trained in create_dummy_model.py
-    input_features = [
-        data.Age,
-        data.SystolicBP,
-        data.DiastolicBP,
-        data.BS,
-        data.BodyTemp,
-        data.HeartRate
-    ]
+    try:
+        # 1. Run Inference by passing the 6 individual arguments
+        # This matches our new MLService.predict(age, sbp, dbp, bs, temp, hr) signature
+        risk, confidence = ml_service.predict(
+            data.Age,
+            data.SystolicBP,
+            data.DiastolicBP,
+            data.BS,
+            data.BodyTemp,
+            data.HeartRate
+        )
 
-    # 2. Run Inference
-    risk, confidence = ml_service.predict(input_features)
-
-    # 3. Return JSON response
-    return {
-        "risk_level": risk,
-        "confidence_score": round(confidence, 2),
-        "timestamp": datetime.now().isoformat()
-    }
+        # 2. Return JSON response
+        return {
+            "risk_level": risk,
+            "confidence_score": round(confidence, 2),
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        # If the model or scaler fails, we catch it here
+        print(f"[API ERROR] Prediction failed: {e}")
+        raise HTTPException(status_code=500, detail="Internal ML Service Error")

@@ -1,81 +1,101 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import numpy as np
 
-# --- 1. Load the Model ---
-# This looks for the files in the CURRENT folder (mamacare-backend)
+# --- 1. Load the "Pro" Model and Scaler ---
 @st.cache_resource
-def load_model():
-    pipeline = joblib.load('maternal_risk_pipeline.joblib')
-    encoder = joblib.load('label_encoder.joblib')
-    return pipeline, encoder
+def load_components():
+    model = joblib.load('rf_pregnancy_risk_model.pkl')
+    scaler = joblib.load('scaler.pkl')
+    return model, scaler
 
 try:
-    pipeline, label_encoder = load_model()
+    model, scaler = load_components()
 except FileNotFoundError:
-    st.error("Error: Model files not found. Run 'python fix_model.py' first.")
+    st.error("❌ Error: Files not found. Ensure 'rf_pregnancy_risk_model.pkl' and 'scaler.pkl' are in this folder.")
     st.stop()
 
-# --- 2. App Title ---
-st.set_page_config(page_title="Maternal Health Risk Predictor", page_icon="🏥")
-st.title("🏥 Maternal Health Risk Predictor")
-st.markdown("### AI-Powered Prenatal Assessment")
-st.info("ℹ️ Model Version: Lite (6 Clinical Features)")
+# --- 2. App Interface ---
+st.set_page_config(page_title="MamaCare Risk Assessment", page_icon="🤰")
+st.title("🤰 MamaCare: Maternal Risk Assessment")
+st.info("ℹ️ Model Version: Pro (11 Clinical Features)")
 
-# --- 3. Input Form ---
-with st.form("risk_assessment_form"):
+with st.form("risk_form"):
+    st.subheader("1. Clinical Vitals")
     col1, col2 = st.columns(2)
     
     with col1:
-        # Note: Variable names match the 'Lite' dataset exactly
-        age = st.number_input("Age (Years)", min_value=10, max_value=70, value=25)
-        systolic_bp = st.number_input("Systolic BP (mm Hg)", min_value=50, max_value=200, value=110)
-        diastolic_bp = st.number_input("Diastolic BP (mm Hg)", min_value=30, max_value=150, value=70)
+        age = st.number_input("Age (Years)", 10, 70, 25)
+        systolic_bp = st.number_input("Systolic BP (mm Hg)", 50, 200, 110)
+        diastolic_bp = st.number_input("Diastolic BP (mm Hg)", 30, 150, 70)
+        bs = st.number_input("Blood Sugar (mmol/L)", 3.0, 20.0, 7.0, step=0.1)
         
     with col2:
-        bs = st.number_input("Blood Sugar (BS)", min_value=3.0, max_value=20.0, value=7.0, step=0.1)
-        body_temp = st.number_input("Body Temperature (F)", min_value=95.0, max_value=105.0, value=98.0, step=0.1)
-        heart_rate = st.number_input("Heart Rate (bpm)", min_value=40, max_value=150, value=72)
+        # --- ADDED MISSING FIELD: BODY TEMP ---
+        body_temp = st.number_input("Body Temperature (F)", 95.0, 105.0, 98.0, step=0.1)
+        bmi = st.number_input("BMI (Body Mass Index)", 10.0, 50.0, 22.0, step=0.1)
+        heart_rate = st.number_input("Heart Rate (bpm)", 40, 150, 72)
 
-    # Submit Button
+    st.subheader("2. Medical History & Indicators")
+    col3, col4 = st.columns(2)
+    
+    with col3:
+        prev_comp = st.selectbox("Previous Complications?", ["No", "Yes"])
+        mental = st.selectbox("Mental Health Issues?", ["No", "Yes"])
+        
+    with col4:
+        p_diabetes = st.selectbox("Pre-existing Diabetes?", ["No", "Yes"])
+        g_diabetes = st.selectbox("Gestational Diabetes?", ["No", "Yes"])
+
     submit_btn = st.form_submit_button("Analyze Risk Profile", type="primary")
 
-# --- 4. Prediction Logic ---
+# --- 3. Prediction Logic ---
 if submit_btn:
-    # Prepare input data matching EXACTLY what fix_model.py trained on
-    # Columns must be: ['Age', 'SystolicBP', 'DiastolicBP', 'BS', 'BodyTemp', 'HeartRate']
-    input_data = {
-        'Age': age,
-        'SystolicBP': systolic_bp,   # NO SPACE in name
-        'DiastolicBP': diastolic_bp, # NO SPACE in name
-        'BS': bs,
-        'BodyTemp': body_temp,       # NO SPACE in name
-        'HeartRate': heart_rate
-    }
+    # 1. Convert Yes/No to 1/0
+    # The order here MUST match the CSV column order exactly.
+    # Based on your dataset image: Age | SysBP | DiaBP | BS | BodyTemp | BMI | PrevComp | PreDiab | GestDiab | Mental | HeartRate
+    features = [
+        age, 
+        systolic_bp, 
+        diastolic_bp, 
+        bs, 
+        body_temp,   # Added this to reach 11 features
+        bmi, 
+        1 if prev_comp == "Yes" else 0, 
+        1 if p_diabetes == "Yes" else 0, 
+        1 if g_diabetes == "Yes" else 0, 
+        1 if mental == "Yes" else 0,     
+        heart_rate   # Heart Rate is often the last feature in this specific dataset
+    ]
     
-    input_df = pd.DataFrame([input_data])
+    # 2. Prepare for Model
+    features_array = np.array(features).reshape(1, -1)
     
     try:
-        # Predict
-        prediction_idx = pipeline.predict(input_df)[0]
-        risk_label = label_encoder.inverse_transform([prediction_idx])[0]
+        # 3. Scale
+        scaled_features = scaler.transform(features_array)
         
-        # Display Results
+        # 4. Predict
+        prediction = model.predict(scaled_features)[0]
+        
+        # 5. Display Result
         st.divider()
         st.subheader("Assessment Result")
         
-        # Handle capitalization differences in dataset (High Risk vs high risk)
-        result_text = risk_label.lower()
+        # Convert prediction to string to handle both numbers (0,1,2) and text
+        result_str = str(prediction).lower()
         
-        if "high" in result_text:
-            st.error(f"⚠️ **HIGH RISK DETECTED**")
-            st.write("Recommendation: Immediate specialist consultation.")
-        elif "mid" in result_text or "moderate" in result_text:
-             st.warning(f"⚠️ **MODERATE RISK DETECTED**")
-             st.write("Recommendation: Schedule follow-up checkup.")
-        else:
-            st.success(f"✅ **LOW RISK**")
-            st.write("Recommendation: Standard care.")
+        if result_str == "2" or "high" in result_str: 
+            st.error("⚠️ **HIGH RISK DETECTED**")
+            st.write("**Recommendation:** Immediate specialist consultation required.")
+        elif result_str == "1" or "mid" in result_str or "moderate" in result_str: 
+            st.warning("⚠️ **MODERATE RISK DETECTED**")
+            st.write("**Recommendation:** Schedule closer monitoring.")
+        else: 
+            st.success("✅ **LOW RISK**")
+            st.write("**Recommendation:** Standard prenatal care.")
             
     except Exception as e:
         st.error(f"An error occurred: {e}")
+        st.write("Debug info - Feature Count:", len(features))

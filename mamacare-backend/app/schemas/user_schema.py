@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
+from datetime import date
 
 # 1. Schema for Registering (Input)
 class UserCreate(BaseModel):
@@ -7,6 +8,7 @@ class UserCreate(BaseModel):
     password: str
     full_name: str
     role: str  # "mother" or "provider"
+    lmp: Optional[date] = None
 
 # 2. Schema for Logging In (Input)
 class UserLogin(BaseModel):

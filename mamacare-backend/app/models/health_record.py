@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Float, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, Float, String, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.core.database import Base
@@ -23,3 +23,6 @@ class HealthRecord(Base):
     # Calculated Risk (We store the result of the ML model here)
     risk_prediction = Column(String) 
     confidence_score = Column(Float)
+    
+    # Triage Lifecycle
+    is_resolved = Column(Boolean, default=False)

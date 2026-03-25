@@ -5,7 +5,8 @@ from passlib.context import CryptContext
 from app.core.config import settings
 
 # 1. Password Hashing Configuration
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Using pbkdf2_sha256 to avoid Windows binary dependency issues with bcrypt/argon2
+pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Checks if the typed password matches the stored hash."""

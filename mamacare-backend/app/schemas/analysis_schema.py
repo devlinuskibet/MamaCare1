@@ -1,11 +1,12 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
-class AnalysisRequest(BaseModel):
-    user_id: int
-    metric: str # e.g., "bp", "glucose"
+class TrendResult(BaseModel):
+    metric: str           # e.g., "SystolicBP"
+    slope: float          # The calculated slope
+    interpretation: str   # "Improving", "Deteriorating", "Stable"
+    data_points: int      # How many records were used
 
-class AnalysisResult(BaseModel):
-    trend: str # "increasing", "decreasing", "stable"
-    slope: float
-    recommendation: str
+class AnalysisResponse(BaseModel):
+    trends: List[TrendResult]
+    overall_status: str   # Summary of her health

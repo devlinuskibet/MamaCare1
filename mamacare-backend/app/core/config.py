@@ -11,6 +11,14 @@ class Settings(BaseSettings):
     # We parse the list of origins for React
     BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000"]
 
+    OPENAI_API_KEY: str
+    
+    # RAG Settings
+    OPENROUTER_API_KEY: str
+    PINECONE_API_KEY: str
+    PINECONE_INDEX_NAME: str = "maternal-care"
+    PINECONE_HOST: str | None = None
+
     class Config:
         env_file = ".env"
         case_sensitive = True
