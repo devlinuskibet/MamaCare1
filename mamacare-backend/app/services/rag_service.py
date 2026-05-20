@@ -25,7 +25,7 @@ class RAGService:
 
         # THE FLAWLESS PERSONA PROMPT
         self.system_prompt = """
-        You are 'MamaBot', a warm, empathetic, and highly intelligent maternal health assistant for the MamaCare platform in Kenya.
+        You are 'MamaAI', a clinical-grade maternal health assistant for the MamaCare platform in Kenya.
 
         YOUR CORE BEHAVIORS:
         1. THE ILLUSION OF KNOWLEDGE: You will be provided with 'Internal Knowledge' to help you answer. Act as if you naturally know this information. ABSOLUTELY NEVER use phrases like "Based on the text", "According to the context", or "The information you shared." Just give the answer directly.
@@ -50,6 +50,51 @@ class RAGService:
             print(f"Embedding Error: {e}")
             raise e
 
+    def get_response_stream(self, query: str):
+        try:
+            # 1. Generate Embedding (Local)
+            query_embedding = self.get_embedding(query)
+
+            # 2. Retrieve Context from Pinecone
+            results = self.index.query(
+                vector=query_embedding,
+                top_k=3, 
+                include_metadata=True
+            )
+
+            context_texts = [match['metadata']['text'] for match in results['matches'] if match.score > 0.3]
+            
+            # THE FIX: Hide the "Context" framing from the AI
+            if context_texts:
+                context_block = "\n---\n".join(context_texts)
+                injected_message = f"INTERNAL KNOWLEDGE:\n{context_block}\n\nUSER QUESTION:\n{query}"
+            else:
+                injected_message = f"USER QUESTION:\n{query}"
+
+            # 3. Augment Prompt (Clean injection)
+            final_messages = [
+                {"role": "system", "content": self.system_prompt},
+                {"role": "user", "content": injected_message}
+            ]
+
+            # 4. Generate Answer via LLM with Stream
+            completion = self.client.chat.completions.create(
+                model="openrouter/free",
+                messages=final_messages,
+                temperature=0.4,
+                stream=True
+            )
+            
+            for chunk in completion:
+                if chunk.choices[0].delta.content is not None:
+                    yield chunk.choices[0].delta.content
+
+        except Exception as e:
+            print(f"RAG Stream Error: {e}")
+            import traceback
+            traceback.print_exc()
+            yield "I encountered a connection error with my brain right now. Please try again in a moment."
+
     def get_response(self, query: str):
         try:
             # 1. Generate Embedding (Local)
@@ -72,7 +117,7 @@ class RAGService:
                 # Frame it as internal memory, not an external document
                 injected_message = f"INTERNAL KNOWLEDGE:\n{context_block}\n\nUSER QUESTION:\n{query}"
             else:
-                source_label = "MamaBot Core (General AI)"
+                source_label = "MamaAI Core (General AI)"
                 # Just pass the question if no PDF data was found
                 injected_message = f"USER QUESTION:\n{query}"
 

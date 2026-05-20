@@ -1,15 +1,35 @@
-# Environments
-venv/
-venv_fix/
-mamacare-backend/venv_fix/
-mamacare-backend/venv/
-
-# Python
+node_modules/
 __pycache__/
 *.pyc
 .env
-
-# Frontend
-node_modules/
+.DS_Store
 dist/
 build/
+coverage/
+venv_fix/
+
+# Python virtual envs (general safety)
+venv/
+env/
+
+# Database
+*.db
+
+# ML models (important)
+*.pkl
+*.pt
+*.bin
+
+# Logs
+*.log
+
+# OS / editor
+.vscode/
+.idea/
+
+# Frontend extras
+*.lock
+
+# MS Office Temp Files
+~$*
+~$*.xl[mx]

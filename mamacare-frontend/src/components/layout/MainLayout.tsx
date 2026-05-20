@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Menu, Home, Activity, MessageCircle, LogOut, Flower2, TrendingUp, User, Stethoscope, Users, FileText } from 'lucide-react';
 import { useUserRole } from '../../contexts/UserContext';
@@ -9,25 +9,17 @@ interface MainLayoutProps {
 
 const MainLayout = ({ children }: MainLayoutProps) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const { userRole, setUserRole } = useUserRole();
+    const { userRole } = useUserRole();
 
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Auto-switch role based on path (Simulated Logic)
-    useEffect(() => {
-        if (location.pathname.startsWith('/provider')) {
-            setUserRole('provider');
-        } else if (['/dashboard', '/vitals', '/chatbot', '/history', '/exercises'].some(path => location.pathname.startsWith(path))) {
-            setUserRole('mother');
-        }
-    }, [location.pathname, setUserRole]);
 
     // Mother Navigation Items
     const motherNavItems = [
         { label: 'Dashboard', path: '/dashboard', icon: <Home size={20} /> },
         { label: 'Check Vitals', path: '/vitals', icon: <Activity size={20} /> },
-        { label: 'MamaBot', path: '/chatbot', icon: <MessageCircle size={20} /> },
+        { label: 'MamaAI', path: '/chatbot', icon: <MessageCircle size={20} /> },
         { label: 'My History', path: '/history', icon: <TrendingUp size={20} /> },
         { label: 'Wellness', path: '/exercises', icon: <Flower2 size={20} /> },
         { label: 'My Profile', path: '/profile', icon: <User size={20} /> },
@@ -115,28 +107,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                     </button>
                 </header>
 
-                {/* Navbar with Role Switcher (Temporary) */}
-                <div className={`hidden lg:flex justify-end p-4 ${isProvider ? 'bg-slate-100' : 'bg-slate-50'}`}>
-                    <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full shadow-sm border border-slate-200">
-                        <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Simulate Role:</span>
-                        <div className="flex bg-slate-100 rounded-full p-1">
-                            <button
-                                onClick={() => setUserRole('mother')}
-                                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${userRole === 'mother' ? 'bg-pink-500 text-white shadow-sm' : 'text-slate-600 hover:text-slate-800'
-                                    }`}
-                            >
-                                Mother
-                            </button>
-                            <button
-                                onClick={() => setUserRole('provider')}
-                                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${userRole === 'provider' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-600 hover:text-slate-800'
-                                    }`}
-                            >
-                                Provider
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                {/* Standard Page Content Padding */}
+                <div className="pt-4 lg:pt-8" />
 
                 {/* Page Content */}
                 <main className="flex-1 overflow-y-auto p-4 lg:p-8 pt-0 lg:pt-0">

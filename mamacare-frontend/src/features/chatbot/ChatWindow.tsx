@@ -17,14 +17,7 @@ const quickPrompts = [
 ];
 
 const ChatWindow = () => {
-    const [messages, setMessages] = useState<Message[]>([
-        {
-            id: 1,
-            text: "Hello Mama! I'm here to support you. How are you feeling today?",
-            sender: 'bot',
-            timestamp: new Date()
-        }
-    ]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState("");
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -36,6 +29,35 @@ const ChatWindow = () => {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    useEffect(() => {
+        document.title = "Chat with MamaAI";
+        const loadHistory = async () => {
+            try {
+                const history = await chatApi.getHistory();
+                if (history && history.length > 0) {
+                    const formatted: Message[] = history.map((m: any, i: number) => ({
+                        id: i + 1,
+                        text: m.content,
+                        sender: m.role === 'user' ? 'user' : 'bot',
+                        timestamp: new Date(m.timestamp)
+                    }));
+                    setMessages(formatted);
+                } else {
+                    // Default welcome message if no history
+                    setMessages([{
+                        id: 1,
+                        text: "Hello Mama! I am MamaAI. How can I support you and your baby today?",
+                        sender: 'bot',
+                        timestamp: new Date()
+                    }]);
+                }
+            } catch (error) {
+                console.error("Failed to load chat history:", error);
+            }
+        };
+        loadHistory();
+    }, []);
 
     const handleSendMessage = async (text: string) => {
         if (!text.trim()) return;
@@ -51,27 +73,58 @@ const ChatWindow = () => {
         setInputValue("");
         setIsTyping(true);
 
-        // Call Real API
+        // Native Fetch API for SSE Parsing
         try {
-            const data = await chatApi.sendMessage(text);
-            const botResponse: Message = {
-                id: messages.length + 2,
-                text: data.response,
-                sender: 'bot',
-                timestamp: new Date()
-            };
-            setMessages(prev => [...prev, botResponse]);
+            const token = localStorage.getItem('access_token');
+            const response = await fetch('http://localhost:8000/api/chat/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ message: text })
+            });
+
+            if (!response.body) throw new Error("No ReadableStream from backend");
+
+            setIsTyping(false); // remove initial UX "thinking"
+            
+            // Build ghost message base
+            const newBotMessageId = messages.length + 2;
+            setMessages(prev => [
+                ...prev, 
+                { id: newBotMessageId, text: '', sender: 'bot', timestamp: new Date() }
+            ]);
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder("utf-8");
+            let done = false;
+
+            while (!done) {
+                const { value, done: readerDone } = await reader.read();
+                done = readerDone;
+                if (value) {
+                    const chunkText = decoder.decode(value, { stream: true });
+                    setMessages(prev => {
+                        return prev.map(msg => {
+                            if (msg.id === newBotMessageId) {
+                                return { ...msg, text: msg.text + chunkText }
+                            }
+                            return msg;
+                        });
+                    });
+                    scrollToBottom();
+                }
+            }
         } catch (error) {
             console.error("Chat Error", error);
-            const errorResponse: Message = {
+            setIsTyping(false);
+            setMessages(prev => [...prev, {
                 id: messages.length + 2,
                 text: "I'm having trouble connecting right now. Please try again.",
                 sender: 'bot',
                 timestamp: new Date()
-            };
-            setMessages(prev => [...prev, errorResponse]);
-        } finally {
-            setIsTyping(false);
+            }]);
         }
     };
 
@@ -90,7 +143,7 @@ const ChatWindow = () => {
                     <Bot size={24} />
                 </div>
                 <div>
-                    <h2 className="font-bold text-slate-800">MamaBot</h2>
+                    <h2 className="font-bold text-slate-800">MamaAI</h2>
                     <p className="text-xs text-slate-500">Always here for you</p>
                 </div>
             </div>
@@ -117,10 +170,11 @@ const ChatWindow = () => {
                 ))}
                 {isTyping && (
                     <div className="flex justify-start">
-                        <div className="bg-pink-50 px-4 py-3 rounded-2xl rounded-bl-none border border-pink-100 flex gap-1">
-                            <span className="w-2 h-2 bg-pink-300 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                            <span className="w-2 h-2 bg-pink-300 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                            <span className="w-2 h-2 bg-pink-300 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                        <div className="bg-pink-50 px-4 py-3 rounded-2xl rounded-bl-none border border-pink-100 flex gap-1 items-center">
+                            <span className="text-xs text-pink-500 font-medium mr-2">MamaAI is thinking</span>
+                            <span className="w-1.5 h-1.5 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                            <span className="w-1.5 h-1.5 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                            <span className="w-1.5 h-1.5 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                         </div>
                     </div>
                 )}
@@ -149,7 +203,7 @@ const ChatWindow = () => {
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="Type a message..."
+                        placeholder="Ask MamaAI anything..."
                         className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500 transition-all placeholder-slate-400"
                     />
                     <button

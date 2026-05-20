@@ -173,13 +173,45 @@ def export_patient_report(
     pdf = PDFReport()
     pdf.add_page()
     
-    # Patient Profile
+    age_str = f"{user.age} yrs" if user and user.age else "N/A"
+    bg_str = user.blood_group if user and user.blood_group else "N/A"
+    g_str = f"{user.gravida}" if user and user.gravida is not None else "Unknown"
+    p_str = f"{user.parity}" if user and user.parity is not None else "Unknown"
+    
+    # Calculate BMI
+    bmi_str = "N/A"
+    if user and user.pre_pregnancy_weight_kg and user.height_cm:
+        try:
+            bmi = user.pre_pregnancy_weight_kg / ((user.height_cm / 100) ** 2)
+            bmi_str = f"{bmi:.1f}"
+        except:
+            pass
+            
+    loc_str = user.location if user and user.location else "N/A"
+
+    # Patient Profile / Official Header
     pdf.set_font("helvetica", "B", 12)
     pdf.set_text_color(15, 23, 42) # Slate 900
-    pdf.cell(0, 8, f"Patient Name: {full_name}", ln=True)
+    pdf.cell(0, 8, "Patient Profile", ln=True)
+    
+    # 2-Column Header Table
     pdf.set_font("helvetica", "", 10)
-    pdf.set_text_color(100, 116, 139) # Slate 500
-    pdf.cell(0, 6, f"Patient Email: {email}", ln=True)
+    pdf.set_text_color(71, 85, 105) # Slate 600
+    
+    # Row 1
+    pdf.cell(90, 6, f"Patient Name: {full_name}", border=0)
+    pdf.cell(90, 6, f"Obstetric: G{g_str} P{p_str}", border=0, ln=True)
+    
+    # Row 2
+    pdf.cell(90, 6, f"Age: {age_str}", border=0)
+    pdf.cell(90, 6, f"BMI: {bmi_str}", border=0, ln=True)
+    
+    # Row 3
+    pdf.cell(90, 6, f"Blood Group: {bg_str}", border=0)
+    pdf.cell(90, 6, f"Location: {loc_str}", border=0, ln=True)
+    
+    pdf.set_font("helvetica", "I", 9)
+    pdf.set_text_color(148, 163, 184) # Slate 400
     pdf.cell(0, 6, f"Generated On: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}", ln=True)
     pdf.ln(10)
     

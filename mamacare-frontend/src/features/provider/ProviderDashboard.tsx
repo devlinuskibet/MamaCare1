@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Eye, AlertCircle, CheckCircle, AlertTriangle, RefreshCw, UploadCloud, PlusCircle, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { endpoints } from '../../api/endpoints';
+import { useUserRole } from '../../contexts/UserContext';
 
 interface Patient {
     id: number;
@@ -14,6 +15,7 @@ interface Patient {
 }
 
 const ProviderDashboard = () => {
+    const { user } = useUserRole();
     const [patients, setPatients] = useState<Patient[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -130,19 +132,19 @@ const ProviderDashboard = () => {
         
         if (normalizedLevel === 'high risk' || normalizedLevel === 'high') {
             return (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-600 border border-red-200">
                     <AlertCircle size={14} /> High Risk
                 </span>
             );
         } else if (normalizedLevel === 'mid risk' || normalizedLevel === 'medium risk' || normalizedLevel === 'moderate risk' || normalizedLevel === 'medium') {
             return (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-yellow-50 text-yellow-700 border border-yellow-200">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-600 border border-yellow-200">
                     <AlertTriangle size={14} /> Caution
                 </span>
             );
         } else if (normalizedLevel === 'low risk' || normalizedLevel === 'stable' || normalizedLevel === 'low') {
             return (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-200">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-600 border border-green-200">
                     <CheckCircle size={14} /> Stable
                 </span>
             );
@@ -170,8 +172,8 @@ const ProviderDashboard = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800">Triage Dashboard</h1>
-                    <p className="text-sm text-slate-500">Live patient monitoring</p>
+                    <h1 className="text-2xl font-bold text-slate-800">MamaCare Provider Portal</h1>
+                    <p className="text-sm text-slate-500">Welcome back, {user?.full_name || 'Dr. Provider'}</p>
                 </div>
                 <div className="flex items-center gap-3">
                     {/* Hidden file input */}

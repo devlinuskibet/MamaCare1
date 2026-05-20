@@ -169,7 +169,7 @@ const LandingPage = () => {
                         </div>
                     </div>
 
-                    {/* Feature B: MamaBot */}
+                    {/* Feature B: MamaAI */}
                     <div className="flex flex-col md:flex-row-reverse items-center gap-12 lg:gap-20">
                         <div className="flex-1 space-y-6">
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-sm font-semibold">
@@ -178,7 +178,7 @@ const LandingPage = () => {
                             </div>
                             <h2 className="text-3xl md:text-4xl font-bold text-slate-900">Your 24/7 Health Companion.</h2>
                             <p className="text-lg text-slate-600 leading-relaxed">
-                                Anxiety doesn't wait for office hours. Chat with MamaBot to get instant, medically-grounded answers to your pregnancy questions.
+                                Anxiety doesn't wait for office hours. Chat with MamaAI to get instant, medically-grounded answers to your pregnancy questions.
                             </p>
                             <div className="flex flex-wrap gap-3">
                                 <span className="px-4 py-2 bg-white rounded-full border border-slate-200 text-slate-600 text-sm font-medium">"Is this cramp normal?"</span>

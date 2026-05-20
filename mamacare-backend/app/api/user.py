@@ -20,6 +20,26 @@ class UserUpdate(BaseModel):
     full_name: Optional[str] = None
     lmp: Optional[datetime.date] = None
 
+    # Required Clinical Baselines
+    age: Optional[int] = None
+    gravida: Optional[int] = None
+    parity: Optional[int] = None
+    living_children: Optional[int] = None
+    blood_group: Optional[str] = None
+    height_cm: Optional[float] = None
+    pre_pregnancy_weight_kg: Optional[float] = None
+    
+    # Medical History Flags
+    has_diabetes: Optional[bool] = None
+    has_hypertension: Optional[bool] = None
+    has_asthma: Optional[bool] = None
+    has_epilepsy: Optional[bool] = None
+    prev_csection: Optional[bool] = None
+    
+    # Gatekeeper Flag
+    is_profile_complete: Optional[bool] = None
+    has_consented: Optional[bool] = None
+
 @router.get("/me")
 def get_my_profile(
     db: Session = Depends(get_db),
@@ -60,7 +80,21 @@ def get_my_profile(
         "lmp": user.lmp,
         "days_pregnant": days_pregnant,
         "current_week": current_week,
-        "trimester": trimester
+        "trimester": trimester,
+        "age": user.age,
+        "gravida": user.gravida,
+        "parity": user.parity,
+        "living_children": user.living_children,
+        "blood_group": user.blood_group,
+        "height_cm": user.height_cm,
+        "pre_pregnancy_weight_kg": user.pre_pregnancy_weight_kg,
+        "has_diabetes": user.has_diabetes,
+        "has_hypertension": user.has_hypertension,
+        "has_asthma": user.has_asthma,
+        "has_epilepsy": user.has_epilepsy,
+        "prev_csection": user.prev_csection,
+        "is_profile_complete": user.is_profile_complete,
+        "has_consented": user.has_consented
     }
 
 @router.put("/update")

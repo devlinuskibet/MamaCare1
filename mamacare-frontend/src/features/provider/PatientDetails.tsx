@@ -96,6 +96,14 @@ const PatientDetails = () => {
     
     // Find the newest active alert to bind the resolve button to
     const activeAlert = history.find(record => !record.is_resolved);
+    const isHighRisk = activeAlert?.risk_prediction?.toLowerCase().includes('high');
+
+    const calculateBmi = (weightKg: number, heightCm: number) => {
+        if (!weightKg || !heightCm) return 'N/A';
+        const heightM = heightCm / 100;
+        const bmi = weightKg / (heightM * heightM);
+        return bmi.toFixed(1);
+    };
 
     return (
         <div className="space-y-6">
@@ -153,37 +161,48 @@ const PatientDetails = () => {
                 {/* Left Column: Stats */}
                 <div className="space-y-6">
                     <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <h2 className="font-bold text-slate-800 mb-4">Patient Stats</h2>
+                        <h2 className="font-bold text-slate-800 mb-4">Clinical Snapshot</h2>
 
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-white rounded-lg text-blue-600 shadow-sm">
-                                        <Droplet size={20} />
-                                    </div>
-                                    <span className="text-sm font-medium text-slate-600">Blood Type</span>
+                            {/* Demographics */}
+                            <div className="p-3 bg-slate-50 rounded-xl space-y-2">
+                                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Demographics</h3>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-slate-500">Age:</span>
+                                    <span className="font-semibold text-slate-900">{profile.age || 'N/A'}</span>
                                 </div>
-                                <span className="font-bold text-slate-900">-</span>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-slate-500">Blood Group:</span>
+                                    <span className="font-semibold text-slate-900">{profile.blood_group || 'N/A'}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-slate-500">BMI:</span>
+                                    <span className="font-semibold text-slate-900">{calculateBmi(profile.weight_kg, profile.height_cm)}</span>
+                                </div>
                             </div>
 
-                            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-white rounded-lg text-purple-600 shadow-sm">
-                                        <Activity size={20} />
-                                    </div>
-                                    <span className="text-sm font-medium text-slate-600">Weight</span>
+                            {/* Obstetric History */}
+                            <div className="p-3 bg-slate-50 rounded-xl space-y-2">
+                                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Obstetric History</h3>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-slate-500">Status:</span>
+                                    <span className="font-semibold text-slate-900">
+                                        G{profile.gravida ?? '?'} P{profile.parity ?? '?'} L{profile.living_children ?? '?'}
+                                    </span>
                                 </div>
-                                <span className="font-bold text-slate-900">-</span>
                             </div>
 
-                            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-white rounded-lg text-emerald-600 shadow-sm">
-                                        <Calendar size={20} />
-                                    </div>
-                                    <span className="text-sm font-medium text-slate-600">Total Records</span>
+                            {/* Safety Info */}
+                            <div className={`p-3 rounded-xl space-y-2 border ${isHighRisk ? 'bg-red-50 border-red-200' : 'bg-slate-50 border-transparent'}`}>
+                                <h3 className={`text-xs font-bold uppercase tracking-wider ${isHighRisk ? 'text-red-700' : 'text-slate-400'}`}>Safety Info</h3>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className={isHighRisk ? 'text-red-600 font-medium' : 'text-slate-500'}>Location:</span>
+                                    <span className={`font-semibold ${isHighRisk ? 'text-red-700' : 'text-slate-900'}`}>{profile.location || 'N/A'}</span>
                                 </div>
-                                <span className="font-bold text-slate-900 text-right text-xs md:text-sm">{history.length}</span>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className={isHighRisk ? 'text-red-600 font-medium' : 'text-slate-500'}>Emergency:</span>
+                                    <span className={`font-semibold ${isHighRisk ? 'text-red-700' : 'text-slate-900'}`}>{profile.emergency_contact || 'N/A'}</span>
+                                </div>
                             </div>
                         </div>
                     </div>

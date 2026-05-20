@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Activity, Heart, Droplet, ArrowRight, Thermometer, User } from 'lucide-react';
 import { healthApi, type PredictionInput, type PredictionOutput } from '../../api/health';
+import { endpoints } from '../../api/endpoints';
+import { getRiskColor } from '../../utils/risk';
 
 const VitalsForm = () => {
 
@@ -10,10 +12,19 @@ const VitalsForm = () => {
         heartRate: '',
         glucose: '',
         temp: '',
-        age: '30' // Added Age as it is required by backend model
+        age: ''
     });
 
     const [loading, setLoading] = useState(false);
+    
+    // Fetch profile age on mount to lock it for model stability
+    useEffect(() => {
+        endpoints.user.getMe().then(res => {
+            if (res.data.age) {
+                setFormData(prev => ({ ...prev, age: String(res.data.age) }));
+            }
+        }).catch(console.error);
+    }, []);
     const [result, setResult] = useState<PredictionOutput | null>(null);
     const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
@@ -62,12 +73,11 @@ const VitalsForm = () => {
 
     // If we have a result, show the Result Card
     if (result) {
-        const isHighRisk = result.risk_level.toLowerCase() === 'high risk';
-        const colorClass = isHighRisk ? 'bg-red-50 border-red-200 text-red-800' : 'bg-green-50 border-green-200 text-green-800';
+        const colorClass = getRiskColor(result.risk_level);
 
         return (
             <div className="max-w-lg mx-auto mt-10 text-center space-y-6 animate-in fade-in zoom-in duration-300">
-                <div className={`p-8 rounded-3xl border-2 ${colorClass}`}>
+                <div className={`p-8 rounded-3xl ${colorClass}`}>
                     <h2 className="text-3xl font-bold mb-2 uppercase">
                         {result.risk_level}
                     </h2>
@@ -112,8 +122,9 @@ const VitalsForm = () => {
                             <input
                                 type="number"
                                 required
-                                className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition"
-                                placeholder="30"
+                                disabled
+                                className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed outline-none"
+                                placeholder="Loading base age..."
                                 value={formData.age}
                                 onChange={e => setFormData({ ...formData, age: e.target.value })}
                             />

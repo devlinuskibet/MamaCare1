@@ -28,7 +28,8 @@ const SignupPage = () => {
                 email: formData.email,
                 password: formData.password,
                 full_name: formData.full_name,
-                role: role
+                role: role,
+                ...(role === 'mother' && formData.lmp ? { lmp: formData.lmp } : {})
             });
             navigate('/login'); // Redirect to login after signup
         } catch (err) {

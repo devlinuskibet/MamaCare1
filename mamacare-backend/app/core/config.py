@@ -19,8 +19,16 @@ class Settings(BaseSettings):
     PINECONE_INDEX_NAME: str = "maternal-care"
     PINECONE_HOST: str | None = None
 
+    # Google OAuth
+    GOOGLE_CLIENT_ID: str = ""
+
+    # Email / OTP
+    MAIL_USERNAME: str = ""
+    MAIL_PASSWORD: str = ""
+
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "ignore"
 
 settings = Settings()

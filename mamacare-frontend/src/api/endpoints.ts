@@ -48,6 +48,7 @@ export const endpoints = {
         manualTriage: (data: any) => api.post<{message: string, risk_prediction: string, confidence_score: number}>('/admin/manual-triage', data),
         getPatientDetails: (userId: string) => api.get<{profile: any, history: any[]}>(`/admin/patient/${userId}`),
         resolveAlert: (recordId: number) => api.patch<{message: string, record_id: number}>(`/admin/record/${recordId}/resolve`),
+        addPatient: (data: any) => api.post<any>('/admin/add-patient', data),
     },
 
     reports: {
@@ -59,6 +60,10 @@ export const endpoints = {
     user: {
         getMe: () => api.get<any>('/user/me'),
         updateProfile: (data: any) => api.put<{message: string}>('/user/update', data),
+    },
+    wellness: {
+        get: () => api.get<any>('/wellness/progress'),
+        sync: (data: { minutes_added: number, zen_session_added?: boolean }) => api.post<any>('/wellness/sync', data)
     }
 };
 

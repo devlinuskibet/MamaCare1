@@ -24,6 +24,7 @@ def predict_risk(data: PredictionInput):
             data.BS,
             data.BodyTemp,
             data.HeartRate
+            
         )
 
         # 2. Return JSON response

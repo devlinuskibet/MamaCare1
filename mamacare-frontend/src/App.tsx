@@ -11,12 +11,37 @@ import LandingPage from './pages/LandingPage';
 import PatientDetails from './features/provider/PatientDetails';
 import ExercisesPage from './features/exercises/ExercisesPage';
 import { UserProvider } from './contexts/UserContext';
-import ProfilePage from './features/common/ProfilePage';
 import PatientDirectory from './features/provider/PatientDirectory';
+import ProfilePage from './features/common/ProfilePage';
 import ReportsDashboard from './features/provider/ReportsDashboard';
+import { Navigate } from 'react-router-dom';
+import { useUserRole } from './contexts/UserContext';
+import ConsentOverlay from './features/common/ConsentOverlay';
+import TermsPage from './pages/TermsPage';
+import OtpPage from './features/auth/OtpPage';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
+const ProtectedRoute = ({ children, requireProfile = true }: { children: React.ReactNode, requireProfile?: boolean }) => {
+    const { isAuthenticated, role, isProfileComplete, hasConsented } = useUserRole();
+
+    if (!isAuthenticated) return <Navigate to="/login" replace />;
+    
+    if (role === 'mother' && !hasConsented) {
+        return <ConsentOverlay />;
+    }
+    
+    if (role === 'mother' && requireProfile && !isProfileComplete) {
+        return <Navigate to="/profile" replace />;
+    }
+
+    return <>{children}</>;
+};
 
 function App() {
     return (
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
         <UserProvider>
             <BrowserRouter>
                 <Routes>
@@ -24,14 +49,16 @@ function App() {
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/signup" element={<SignupPage />} />
+                    <Route path="/terms" element={<TermsPage />} />
+                    <Route path="/otp" element={<OtpPage />} />
 
-                    {/* Protected Routes (Wrapped in MainLayout) */}
-                    <Route path="/dashboard" element={<MainLayout><MotherDashboard /></MainLayout>} />
-                    <Route path="/vitals" element={<MainLayout><VitalsForm /></MainLayout>} />
-                    <Route path="/chatbot" element={<MainLayout><ChatWindow /></MainLayout>} />
-                    <Route path="/history" element={<MainLayout><HealthHistory /></MainLayout>} />
-                    <Route path="/exercises" element={<MainLayout><ExercisesPage /></MainLayout>} />
-                    <Route path="/profile" element={<MainLayout><ProfilePage /></MainLayout>} />
+                    {/* Protected Routes (Wrapped in MainLayout and Gatekeeper) */}
+                    <Route path="/dashboard" element={<ProtectedRoute><MainLayout><MotherDashboard /></MainLayout></ProtectedRoute>} />
+                    <Route path="/vitals" element={<ProtectedRoute><MainLayout><VitalsForm /></MainLayout></ProtectedRoute>} />
+                    <Route path="/chatbot" element={<ProtectedRoute><MainLayout><ChatWindow /></MainLayout></ProtectedRoute>} />
+                    <Route path="/history" element={<ProtectedRoute><MainLayout><HealthHistory /></MainLayout></ProtectedRoute>} />
+                    <Route path="/exercises" element={<ProtectedRoute><MainLayout><ExercisesPage /></MainLayout></ProtectedRoute>} />
+                    <Route path="/profile" element={<ProtectedRoute requireProfile={false}><MainLayout><ProfilePage /></MainLayout></ProtectedRoute>} />
 
                     {/* Provider Routes (Ideally protected by role, but open for now) */}
                     <Route path="/provider" element={<MainLayout><ProviderDashboard /></MainLayout>} />
@@ -41,6 +68,7 @@ function App() {
                 </Routes>
             </BrowserRouter>
         </UserProvider>
+        </GoogleOAuthProvider>
     );
 }
 

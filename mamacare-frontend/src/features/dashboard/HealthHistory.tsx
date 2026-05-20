@@ -11,6 +11,7 @@ import {
     ResponsiveContainer, 
     Legend 
 } from 'recharts';
+import { getRiskColor } from '../../utils/risk';
 
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -18,7 +19,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         if (!data) return null;
 
         const risk = data.risk_prediction || data.risk_level || 'N/A';
-        const isHighRisk = String(risk).toLowerCase() === 'high risk';
+        const riskColor = getRiskColor(risk);
         const confidence = typeof data.confidence_score === 'number' 
             ? `${(data.confidence_score * 100).toFixed(1)}%` 
             : 'N/A';
@@ -34,7 +35,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
                     </p>
                 ))}
                 <div className="mt-2 pt-2 border-t border-slate-50">
-                    <p className={`text-xs font-bold uppercase ${isHighRisk ? 'text-red-500' : 'text-green-500'}`}>
+                    <p className={`text-xs font-bold uppercase ${riskColor}`}>
                         Risk: {risk}
                     </p>
                     <p className="text-[10px] text-slate-400">Confidence: {confidence}</p>
@@ -190,12 +191,8 @@ const HealthHistory = () => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold
-                                            ${record.risk_prediction.toLowerCase() === 'high risk'
-                                                ? 'bg-red-100 text-red-700'
-                                                : 'bg-green-100 text-green-700'
-                                            }`}>
-                                            {record.risk_prediction.toLowerCase() === 'high risk' && <AlertTriangle size={12} />}
+                                        <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${getRiskColor(record.risk_prediction)}`}>
+                                            {record.risk_prediction.toLowerCase().includes('high') && <AlertTriangle size={12} />}
                                             {record.risk_prediction || 'Normal'}
                                         </span>
                                     </td>

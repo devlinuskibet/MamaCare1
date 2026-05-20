@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Heart, Stethoscope, ArrowRight, Baby, ArrowLeft } from 'lucide-react';
 import { useUserRole } from '../../contexts/UserContext';
+import { GoogleLogin } from '@react-oauth/google';
 
 const LoginPage = () => {
     const navigate = useNavigate();
-    const { login } = useUserRole();
+    const { login, googleLogin } = useUserRole();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [role, setRole] = useState<'mother' | 'provider'>('mother');
@@ -20,13 +21,11 @@ const LoginPage = () => {
         e.preventDefault();
         setLoading(true);
         setError('');
-
         try {
-            // Note: The backend expects 'username' (which is the email) and 'password'
-            await login({ username: formData.email, password: formData.password });
-
-            // Redirect based on selected role (or the one returned/stored)
-            if (role === 'provider') {
+            const result = await login({ username: formData.email, password: formData.password });
+            if (result === 'needs_otp') {
+                navigate('/otp');
+            } else if (role === 'provider') {
                 navigate('/provider');
             } else {
                 navigate('/dashboard');
@@ -34,6 +33,19 @@ const LoginPage = () => {
         } catch (err) {
             console.error(err);
             setError('Invalid email or password. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleGoogleSuccess = async (credentialResponse: any) => {
+        setLoading(true);
+        setError('');
+        try {
+            const result = await googleLogin(credentialResponse.credential);
+            if (result === 'needs_otp') navigate('/otp');
+        } catch (err: any) {
+            setError(err.message || 'Google Sign-In failed.');
         } finally {
             setLoading(false);
         }
@@ -162,14 +174,25 @@ const LoginPage = () => {
                                 <div className="w-full border-t border-slate-200" />
                             </div>
                             <div className="relative flex justify-center text-sm">
-                                <span className="px-2 bg-white text-slate-500">
-                                    New to MamaCare?
-                                </span>
+                                <span className="px-2 bg-white text-slate-500">Or continue with</span>
                             </div>
                         </div>
 
-                        <div className="mt-6 text-center">
-                            <Link to="/signup" className="text-pink-600 hover:text-pink-500 font-medium">
+                        {/* Google Login Button */}
+                        <div className="mt-4 flex justify-center">
+                            <GoogleLogin
+                                onSuccess={handleGoogleSuccess}
+                                onError={() => setError('Google Sign-In was cancelled or failed.')}
+                                theme="outline"
+                                size="large"
+                                text="signin_with"
+                                shape="rectangular"
+                            />
+                        </div>
+
+                        <div className="mt-4 text-center">
+                            <span className="text-slate-500 text-sm">New to MamaCare? </span>
+                            <Link to="/signup" className="text-pink-600 hover:text-pink-500 font-medium text-sm">
                                 Create an account
                             </Link>
                         </div>

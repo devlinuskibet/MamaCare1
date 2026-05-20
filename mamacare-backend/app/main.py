@@ -12,8 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import engine, Base
 from app.models import health_record 
-# UPDATE IMPORTS HERE
-from app.api import auth, prediction, health, analysis, admin, reports, user
+from app.api import auth, prediction, health, analysis, admin, reports, user, wellness
 
 # 1. Create Database Tables
 Base.metadata.create_all(bind=engine)
@@ -51,6 +50,7 @@ app.include_router(user.router, prefix="/api/user", tags=["User Profile"])
 # ADD THIS LINE
 from app.api import chatbot
 app.include_router(chatbot.router, prefix="/api/chat", tags=["AI Chatbot"])
+app.include_router(wellness.router, prefix="/api/wellness", tags=["Wellness Tracking"])
 
 @app.get("/")
 def root():

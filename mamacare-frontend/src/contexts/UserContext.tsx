@@ -5,12 +5,18 @@ interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
     role: 'mother' | 'provider' | null;
-    login: (credentials: LoginCredentials) => Promise<void>;
+    login: (credentials: LoginCredentials) => Promise<string>;
+    googleLogin: (idToken: string) => Promise<string>; // returns 'needs_otp'
     signup: (data: SignupData) => Promise<void>;
     logout: () => void;
-    // We keep these for straightforward access in components
     userRole: 'mother' | 'provider';
     setUserRole: (role: 'mother' | 'provider') => void;
+    isProfileComplete: boolean;
+    setIsProfileComplete: (status: boolean) => void;
+    hasConsented: boolean;
+    setHasConsented: (status: boolean) => void;
+    pendingOtpEmail: string | null;
+    verifyOtp: (code: string) => Promise<string>;
 }
 
 const UserContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,7 +25,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     // Basic state
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(localStorage.getItem('access_token'));
-    const [userRole, setUserRole] = useState<'mother' | 'provider'>('mother'); // Legacy state from previous steps
+    const [userRole, setUserRole] = useState<'mother' | 'provider'>('mother');
+    const [isProfileComplete, setIsProfileComplete] = useState<boolean>(localStorage.getItem('profile_complete') === 'true');
+    const [hasConsented, setHasConsented] = useState<boolean>(localStorage.getItem('has_consented') === 'true');
+    const [pendingOtpEmail, setPendingOtpEmail] = useState<string | null>(null);
 
     // Hydrate state from localStorage on mount (simple version)
     useEffect(() => {
@@ -31,29 +40,76 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         if (storedRole) {
             setUserRole(storedRole);
         }
+        setIsProfileComplete(localStorage.getItem('profile_complete') === 'true');
+        setHasConsented(localStorage.getItem('has_consented') === 'true');
     }, []);
 
-    const login = async (credentials: LoginCredentials) => {
+    const login = async (credentials: LoginCredentials): Promise<string> => {
         try {
-            const data = await authApi.login({ email: credentials.username, password: credentials.password });
-            localStorage.setItem('access_token', data.access_token);
-            // Assuming the backend response structure matches AuthResponse interface
-            // If backend doesn't return role, we might need to decode token or fetch user profile
-            // For now, let's assume we can derive or it's returned.
-            // If strictly following prompt "Action: On success, save access_token to localStorage", we do that.
+            const response = await fetch('http://localhost:8000/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: credentials.username, password: credentials.password })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.detail || 'Login failed');
 
-            // Note: The prompt's AuthResponse interface includes 'role'.
-            const role = data.role as 'mother' | 'provider';
-
-            setToken(data.access_token);
-            setUser({ email: credentials.username, full_name: data.user_name, role: role });
-
-            setUserRole(role);
-            localStorage.setItem('user_role', role);
+            if (data.requires_otp) {
+                setPendingOtpEmail(data.email);
+                return 'needs_otp';
+            }
+            return 'done';
         } catch (error) {
             console.error("Login failed", error);
             throw error;
         }
+    };
+
+    const googleLogin = async (idToken: string): Promise<string> => {
+        const response = await fetch('http://localhost:8000/api/auth/google', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_token: idToken })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || 'Google login failed');
+        if (data.requires_otp) {
+            setPendingOtpEmail(data.email);
+            return 'needs_otp';
+        }
+        return 'done';
+    };
+
+    const _applySession = (data: any) => {
+        const role = data.role as 'mother' | 'provider';
+        const profileStatus = data.is_profile_complete || false;
+        const consentStatus = data.has_consented || false;
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('user_role', role);
+        localStorage.setItem('profile_complete', String(profileStatus));
+        localStorage.setItem('has_consented', String(consentStatus));
+        setToken(data.access_token);
+        setUser({ email: pendingOtpEmail || '', full_name: data.user_name, role, is_profile_complete: profileStatus, has_consented: consentStatus });
+        setUserRole(role);
+        setIsProfileComplete(profileStatus);
+        setHasConsented(consentStatus);
+        setPendingOtpEmail(null);
+    };
+
+    const verifyOtp = async (code: string): Promise<string> => {
+        if (!pendingOtpEmail) throw new Error('No pending OTP session.');
+        const response = await fetch('http://localhost:8000/api/auth/verify-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: pendingOtpEmail, otp_code: code })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || 'OTP verification failed');
+        _applySession(data);
+        if (data.role === 'provider') return 'provider';
+        if (!data.is_profile_complete) return 'needs_profile';
+        if (!data.has_consented) return 'needs_consent';
+        return 'ok';
     };
 
     const signup = async (data: SignupData) => {
@@ -75,9 +131,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const logout = () => {
         localStorage.removeItem('access_token');
         localStorage.removeItem('user_role');
+        localStorage.removeItem('profile_complete');
+        localStorage.removeItem('has_consented');
         setToken(null);
         setUser(null);
-        setUserRole('mother'); // Reset to default
+        setUserRole('mother');
+        setIsProfileComplete(false);
+        setHasConsented(false);
     };
 
     return (
@@ -86,10 +146,17 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             isAuthenticated: !!token,
             role: userRole,
             login,
+            googleLogin,
             signup,
             logout,
             userRole,
-            setUserRole
+            setUserRole,
+            isProfileComplete,
+            setIsProfileComplete,
+            hasConsented,
+            setHasConsented,
+            pendingOtpEmail,
+            verifyOtp
         }}>
             {children}
         </UserContext.Provider>

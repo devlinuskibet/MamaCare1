@@ -4,12 +4,16 @@ export interface User {
     email: string;
     full_name: string;
     role: 'mother' | 'provider';
+    is_profile_complete?: boolean;
+    has_consented?: boolean;
 }
 
 export interface AuthResponse {
     access_token: string;
     role: string;
     user_name: string;
+    is_profile_complete: boolean;
+    has_consented: boolean;
 }
 
 export interface LoginCredentials {
@@ -27,6 +31,7 @@ export interface SignupData {
     password: string;
     full_name: string;
     role: 'mother' | 'provider';
+    lmp?: string;
 }
 
 export const authApi = {

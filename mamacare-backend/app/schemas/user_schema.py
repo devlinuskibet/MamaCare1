@@ -21,6 +21,8 @@ class Token(BaseModel):
     token_type: str
     role: str
     user_name: str
+    is_profile_complete: Optional[bool] = False
+    has_consented: Optional[bool] = False
 
 # 4. Schema for displaying User Info (Output - No password included!)
 class UserResponse(BaseModel):

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
+from app.schemas.admin_schema import AdminPatientCreate, AdminPatientResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import case, desc
 from sqlalchemy import case, desc
@@ -278,6 +279,15 @@ def get_patient_details(
             "id": user.id,
             "full_name": user.full_name,
             "email": user.email,
+            "age": user.age,
+            "blood_group": user.blood_group,
+            "weight_kg": user.pre_pregnancy_weight_kg,
+            "height_cm": user.height_cm,
+            "location": user.location,
+            "emergency_contact": user.emergency_contact,
+            "gravida": user.gravida,
+            "parity": user.parity,
+            "living_children": user.living_children
         },
         "history": records
     }
@@ -334,3 +344,79 @@ def get_patient_directory(
             })
             
     return directory
+
+@router.post("/add-patient", response_model=AdminPatientResponse)
+def add_patient(
+    data: AdminPatientCreate,
+    db: Session = Depends(get_db),
+    admin_user: dict = Depends(get_admin_user)
+):
+    """
+    Provider-led onboarding for patients. Calculates BMI, Obstetric Shorthand.
+    If vitals are present, immediately triggers triage and saves a record.
+    """
+    existing_user = db.query(User).filter(User.email == data.email).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+        
+    bmi = None
+    if data.height_cm and data.pre_pregnancy_weight_kg:
+        height_m = data.height_cm / 100
+        if height_m > 0:
+            bmi = round(data.pre_pregnancy_weight_kg / (height_m ** 2), 2)
+        
+    shorthand = f"G{data.gravida} P{data.parity} L{data.living_children}"
+        
+    new_user = User(
+        email=data.email,
+        hashed_password="provider_added_no_login",
+        full_name=data.full_name,
+        role="mother",
+        age=data.age,
+        blood_group=data.blood_group,
+        gravida=data.gravida,
+        parity=data.parity,
+        living_children=data.living_children,
+        height_cm=data.height_cm,
+        pre_pregnancy_weight_kg=data.pre_pregnancy_weight_kg,
+        is_active=True
+    )
+    db.add(new_user)
+    db.flush()
+    
+    risk_prediction = None
+    if all(v is not None for v in [data.systolic_bp, data.diastolic_bp, data.blood_sugar, data.body_temp, data.heart_rate]):
+        input_features = [
+            data.age,
+            data.systolic_bp,
+            data.diastolic_bp,
+            data.blood_sugar,
+            data.body_temp,
+            data.heart_rate
+        ]
+        risk_prediction, confidence = ml_service.predict(input_features)
+        
+        record = HealthRecord(
+            user_email=new_user.email,
+            systolic_bp=data.systolic_bp,
+            diastolic_bp=data.diastolic_bp,
+            blood_sugar=data.blood_sugar,
+            body_temp=data.body_temp,
+            heart_rate=data.heart_rate,
+            risk_prediction=risk_prediction,
+            confidence_score=confidence
+        )
+        db.add(record)
+        
+    db.commit()
+    
+    return {
+        "id": new_user.id,
+        "full_name": new_user.full_name,
+        "email": new_user.email,
+        "message": "Patient successfully registered.",
+        "bmi": bmi,
+        "obstetric_shorthand": shorthand,
+        "risk_prediction": risk_prediction
+    }
+
