@@ -13,11 +13,11 @@ export interface PatientData {
 }
 
 export interface VitalSigns {
-    systolic: number;
-    diastolic: number;
-    bs: number;
-    heart_rate: number;
-    risk_status: "Normal" | "Mid Risk" | "High Risk";
+    systolic: number | string;
+    diastolic: number | string;
+    bs: number | string;
+    heart_rate: number | string;
+    risk_status: string;
 }
 
 interface ClinicalPassportProps {
@@ -29,17 +29,16 @@ const ClinicalPassport: React.FC<ClinicalPassportProps> = ({ patientData, latest
     const componentRef = useRef<HTMLDivElement>(null);
     
     const handlePrint = useReactToPrint({
-        content: () => componentRef.current,
+        contentRef: componentRef,
         documentTitle: `MamaCare_Passport_${patientData.full_name.replace(/\s+/g, '_')}`,
     });
 
     const getStatusColor = (status: string) => {
-        switch(status) {
-            case 'High Risk': return 'text-red-600 font-bold';
-            case 'Mid Risk': return 'text-orange-500 font-bold';
-            case 'Normal': return 'text-green-600 font-bold';
-            default: return 'text-slate-700';
-        }
+        const normalizedStatus = status?.toLowerCase() || '';
+        if (normalizedStatus.includes('high')) return 'text-red-600 font-bold';
+        if (normalizedStatus.includes('mid') || normalizedStatus.includes('medium')) return 'text-orange-500 font-bold';
+        if (normalizedStatus.includes('normal') || normalizedStatus.includes('low')) return 'text-green-600 font-bold';
+        return 'text-slate-700';
     };
 
     return (
