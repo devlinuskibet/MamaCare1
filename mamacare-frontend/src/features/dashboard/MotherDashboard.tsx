@@ -5,7 +5,9 @@ import { Activity, Calendar, FileText, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import TrendAnalysis from './TrendAnalysis';
 import { endpoints } from '../../api/endpoints';
-
+import ClinicalPassport from '../../components/ClinicalPassport';
+import { healthApi } from '../../api/health';
+import type { HealthHistoryItem } from '../../api/health';
 const BABY_SIZE_MAP: Record<number, string> = {
     4: 'Poppy Seed',
     8: 'Raspberry',
@@ -31,15 +33,20 @@ const getBabySize = (week: number): string => {
 
 const MotherDashboard = () => {
     const [profile, setProfile] = useState<any>(null);
+    const [history, setHistory] = useState<HealthHistoryItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const res = await endpoints.user.getMe();
-                setProfile(res.data);
+                const [resProfile, resHistory] = await Promise.all([
+                    endpoints.user.getMe(),
+                    healthApi.getHistory()
+                ]);
+                setProfile(resProfile.data);
+                setHistory(resHistory || []);
             } catch (err) {
-                console.error("Failed to load timeline.", err);
+                console.error("Failed to load dashboard data.", err);
             } finally {
                 setIsLoading(false);
             }
@@ -118,6 +125,40 @@ const MotherDashboard = () => {
             <div className="bg-slate-50 p-6 rounded-3xl">
                 <TrendAnalysis />
             </div>
+
+            {/* 5. Clinical Passport */}
+            {profile && (
+                <div className="mt-12 pt-8 border-t border-slate-200">
+                    <div className="mb-4">
+                        <h2 className="text-xl font-bold text-slate-800">Clinical Passport</h2>
+                        <p className="text-slate-500">Easily generate and download your medical records.</p>
+                    </div>
+                    <ClinicalPassport 
+                        patientData={{
+                            full_name: profile.full_name || profile.name || "N/A",
+                            age: profile.age || "N/A",
+                            blood_group: profile.blood_group || "N/A",
+                            location: profile.location || profile.address || "N/A",
+                            gravida: profile.gravida || 0,
+                            parity: profile.parity || 0,
+                            bmi: profile.bmi || "N/A"
+                        }}
+                        latestVitals={history && history.length > 0 ? {
+                            systolic: history[0].systolic_bp,
+                            diastolic: history[0].diastolic_bp,
+                            bs: history[0].blood_sugar,
+                            heart_rate: history[0].heart_rate,
+                            risk_status: history[0].risk_prediction || "Unknown"
+                        } : {
+                            systolic: "N/A",
+                            diastolic: "N/A",
+                            bs: "N/A",
+                            heart_rate: "N/A",
+                            risk_status: "No vitals recorded yet"
+                        }}
+                    />
+                </div>
+            )}
         </div>
     );
 };
