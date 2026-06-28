@@ -23,7 +23,7 @@ const ScanGallery: React.FC<ScanGalleryProps> = ({ scans, onScanClick }) => {
     return (
         <div className="mt-8">
             <h2 className="text-2xl font-bold text-slate-800 mb-6">Ultrasound & Scan Gallery</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {scans.map((scan) => (
                     <div 
                         key={scan.id} 

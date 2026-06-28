@@ -29,15 +29,15 @@ const FetalPortal = () => {
     };
 
     return (
-        <div className="space-y-8 pb-12">
-            <div className="mb-8 flex justify-between items-end">
+        <div className="space-y-6 md:space-y-8 pb-12">
+            <div className="mb-6 md:mb-8 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-800">Baby's Portal</h1>
-                    <p className="text-slate-500 mt-2 text-lg">Track your baby's development and scans.</p>
+                    <p className="text-slate-500 mt-2 text-base md:text-lg">Track your baby's development and scans.</p>
                 </div>
                 <button 
                     onClick={() => setIsAddModalOpen(true)}
-                    className="flex items-center gap-2 bg-pink-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-pink-700 transition-colors shadow-sm"
+                    className="flex items-center justify-center gap-2 bg-pink-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-pink-700 transition-colors shadow-sm w-full sm:w-auto"
                 >
                     <Plus size={20} />
                     Upload Scan
