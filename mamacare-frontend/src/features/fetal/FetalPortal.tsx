@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import GestationalOverview from './GestationalOverview';
 import ScanGallery, { ScanData } from './ScanGallery';
 import AddScanModal from './AddScanModal';
+import KickCounter from './KickCounter';
 import { Plus } from 'lucide-react';
 
 const FetalPortal = () => {
@@ -41,7 +42,14 @@ const FetalPortal = () => {
                 </button>
             </div>
             
-            <GestationalOverview />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2">
+                    <GestationalOverview />
+                </div>
+                <div className="lg:col-span-1">
+                    <KickCounter />
+                </div>
+            </div>
             
             <ScanGallery scans={scans} onScanClick={(scan) => console.log('Clicked', scan)} />
 
