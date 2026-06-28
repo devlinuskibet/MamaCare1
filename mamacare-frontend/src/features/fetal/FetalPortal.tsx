@@ -3,6 +3,7 @@ import GestationalOverview from './GestationalOverview';
 import ScanGallery, { ScanData } from './ScanGallery';
 import AddScanModal from './AddScanModal';
 import KickCounter from './KickCounter';
+import ScanLightbox from './ScanLightbox';
 import { Plus } from 'lucide-react';
 
 const FetalPortal = () => {
@@ -17,6 +18,7 @@ const FetalPortal = () => {
         }
     ]);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [selectedScan, setSelectedScan] = useState<ScanData | null>(null);
 
     const handleAddScan = (newScan: Omit<ScanData, 'id'>) => {
         const scan: ScanData = {
@@ -51,12 +53,17 @@ const FetalPortal = () => {
                 </div>
             </div>
             
-            <ScanGallery scans={scans} onScanClick={(scan) => console.log('Clicked', scan)} />
+            <ScanGallery scans={scans} onScanClick={(scan) => setSelectedScan(scan)} />
 
             <AddScanModal 
                 isOpen={isAddModalOpen} 
                 onClose={() => setIsAddModalOpen(false)} 
                 onAdd={handleAddScan} 
+            />
+
+            <ScanLightbox 
+                scan={selectedScan} 
+                onClose={() => setSelectedScan(null)} 
             />
         </div>
     );
