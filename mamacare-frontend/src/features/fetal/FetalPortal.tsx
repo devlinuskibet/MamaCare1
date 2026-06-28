@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import GestationalOverview from './GestationalOverview';
-import ScanGallery, { ScanData } from './ScanGallery';
+import ScanGallery from './ScanGallery';
+import type { ScanData } from './ScanGallery';
 import AddScanModal from './AddScanModal';
 import KickCounter from './KickCounter';
 import ScanLightbox from './ScanLightbox';
