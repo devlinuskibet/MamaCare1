@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, UploadCloud } from 'lucide-react';
-import { ScanData } from './ScanGallery';
+import type { ScanData } from './ScanGallery';
 
 interface AddScanModalProps {
     isOpen: boolean;

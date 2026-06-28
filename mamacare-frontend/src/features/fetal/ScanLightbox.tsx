@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Calendar, MapPin, Image as ImageIcon } from 'lucide-react';
-import { ScanData } from './ScanGallery';
+import type { ScanData } from './ScanGallery';
 
 interface ScanLightboxProps {
     scan: ScanData | null;
