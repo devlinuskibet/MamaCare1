@@ -17,7 +17,17 @@ interface ScanGalleryProps {
 
 const ScanGallery: React.FC<ScanGalleryProps> = ({ scans, onScanClick }) => {
     if (scans.length === 0) {
-        return null; // Handled by empty state later
+        return (
+            <div className="mt-8 bg-white border-2 border-dashed border-slate-200 rounded-3xl p-12 flex flex-col items-center justify-center text-center hover:bg-slate-50 transition-colors duration-300">
+                <div className="w-24 h-24 bg-pink-50 rounded-full flex items-center justify-center mb-6">
+                    <ImageIcon className="text-pink-300" size={48} />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-800 mb-2">No Scans Yet</h3>
+                <p className="text-slate-500 max-w-sm">
+                    Upload your first ultrasound or scan to start tracking your baby's development visually.
+                </p>
+            </div>
+        );
     }
 
     return (
