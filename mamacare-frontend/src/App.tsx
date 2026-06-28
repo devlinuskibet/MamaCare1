@@ -10,6 +10,7 @@ import SignupPage from './features/auth/SignupPage';
 import LandingPage from './pages/LandingPage';
 import PatientDetails from './features/provider/PatientDetails';
 import ExercisesPage from './features/exercises/ExercisesPage';
+import FetalPortal from './features/fetal/FetalPortal';
 import { UserProvider } from './contexts/UserContext';
 import PatientDirectory from './features/provider/PatientDirectory';
 import ProfilePage from './features/common/ProfilePage';
@@ -58,6 +59,7 @@ function App() {
                     <Route path="/chatbot" element={<ProtectedRoute><MainLayout><ChatWindow /></MainLayout></ProtectedRoute>} />
                     <Route path="/history" element={<ProtectedRoute><MainLayout><HealthHistory /></MainLayout></ProtectedRoute>} />
                     <Route path="/exercises" element={<ProtectedRoute><MainLayout><ExercisesPage /></MainLayout></ProtectedRoute>} />
+                    <Route path="/fetal" element={<ProtectedRoute><MainLayout><FetalPortal /></MainLayout></ProtectedRoute>} />
                     <Route path="/profile" element={<ProtectedRoute requireProfile={false}><MainLayout><ProfilePage /></MainLayout></ProtectedRoute>} />
 
                     {/* Provider Routes (Ideally protected by role, but open for now) */}
