@@ -31,23 +31,23 @@ const FetalSizeVisualizer = () => {
     const currentComparison = getComparison();
 
     return (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6 md:p-8">
             <div className="flex flex-col md:flex-row md:items-start justify-between mb-8 gap-4">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-800 mb-2">How Big is Baby?</h2>
-                    <p className="text-slate-500">Slide to see how your baby is growing week by week.</p>
+                    <h2 className="text-xl sm:text-2xl font-bold text-slate-800 mb-1 sm:mb-2">How Big is Baby?</h2>
+                    <p className="text-sm sm:text-base text-slate-500">Slide to see how your baby is growing week by week.</p>
                 </div>
                 
-                <div className="flex items-center bg-slate-100 p-1 rounded-lg self-start">
+                <div className="flex flex-wrap items-center bg-slate-100 p-1 rounded-lg w-full sm:w-auto">
                     <button 
                         onClick={() => setIsLocalized(false)}
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${!isLocalized ? 'bg-white shadow-sm text-pink-600' : 'text-slate-500 hover:text-slate-700'}`}
+                        className={`flex-1 sm:flex-none px-3 py-2 sm:px-4 rounded-md text-xs sm:text-sm font-medium transition-colors ${!isLocalized ? 'bg-white shadow-sm text-pink-600' : 'text-slate-500 hover:text-slate-700'}`}
                     >
                         Standard
                     </button>
                     <button 
                         onClick={() => setIsLocalized(true)}
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${isLocalized ? 'bg-white shadow-sm text-pink-600' : 'text-slate-500 hover:text-slate-700'}`}
+                        className={`flex-1 sm:flex-none px-3 py-2 sm:px-4 rounded-md text-xs sm:text-sm font-medium transition-colors ${isLocalized ? 'bg-white shadow-sm text-pink-600' : 'text-slate-500 hover:text-slate-700'}`}
                     >
                         Localized Kenya
                     </button>
