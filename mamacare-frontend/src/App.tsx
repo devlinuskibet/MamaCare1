@@ -44,7 +44,7 @@ function App() {
     return (
         <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
         <UserProvider>
-            <BrowserRouter>
+            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                 <Routes>
                     {/* Public Routes */}
                     <Route path="/" element={<LandingPage />} />
@@ -59,7 +59,7 @@ function App() {
                     <Route path="/chatbot" element={<ProtectedRoute><MainLayout><ChatWindow /></MainLayout></ProtectedRoute>} />
                     <Route path="/history" element={<ProtectedRoute><MainLayout><HealthHistory /></MainLayout></ProtectedRoute>} />
                     <Route path="/exercises" element={<ProtectedRoute><MainLayout><ExercisesPage /></MainLayout></ProtectedRoute>} />
-                    <Route path="/fetal" element={<ProtectedRoute><MainLayout><FetalPortal /></MainLayout></ProtectedRoute>} />
+                    <Route path="/dashboard/baby-portal" element={<ProtectedRoute><MainLayout><FetalPortal /></MainLayout></ProtectedRoute>} />
                     <Route path="/profile" element={<ProtectedRoute requireProfile={false}><MainLayout><ProfilePage /></MainLayout></ProtectedRoute>} />
 
                     {/* Provider Routes (Ideally protected by role, but open for now) */}
