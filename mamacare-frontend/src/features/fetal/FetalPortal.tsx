@@ -5,6 +5,7 @@ import type { ScanData } from './ScanGallery';
 import AddScanModal from './AddScanModal';
 import ContractionTimer from './ContractionTimer';
 import FetalSizeVisualizer from './FetalSizeVisualizer';
+import FetalJournal from './FetalJournal';
 import KickCounter from './KickCounter';
 import ScanLightbox from './ScanLightbox';
 import { Plus, Activity, Ruler, Book, Image as ImageIcon } from 'lucide-react';
@@ -100,9 +101,7 @@ const FetalPortal = () => {
             )}
 
             {activeTab === 'journal' && (
-                <div className="p-8 text-center text-slate-500 bg-white rounded-xl shadow-sm border border-slate-100">
-                    Fetal Journal Component (Coming Soon)
-                </div>
+                <FetalJournal />
             )}
 
             <AddScanModal 
