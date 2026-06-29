@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Activity, BarChart2 } from 'lucide-react';
+import { Activity } from 'lucide-react';
 import AnalyticsTab from './AnalyticsTab';
 
 const KickCounter = () => {
