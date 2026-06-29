@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import GestationalOverview from './GestationalOverview';
 import ScanGallery from './ScanGallery';
 import type { ScanData } from './ScanGallery';
