@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 const mockData = [
     { hour: '8am', count: 2 },
