@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 // For simplicity, we just use some mock sizes for standard comparison
 const STANDARD_SIZES: Record<number, { name: string, detail: string, icon: string }> = {
