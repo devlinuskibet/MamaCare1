@@ -22,7 +22,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         { label: 'MamaAI', path: '/chatbot', icon: <MessageCircle size={20} /> },
         { label: 'My History', path: '/history', icon: <TrendingUp size={20} /> },
         { label: 'Wellness', path: '/exercises', icon: <Flower2 size={20} /> },
-        { label: "Baby's Portal", path: '/fetal', icon: <Baby size={20} /> },
+        { label: "Baby's Portal", path: '/dashboard/baby-portal', icon: <Baby size={20} /> },
         { label: 'My Profile', path: '/profile', icon: <User size={20} /> },
     ];
 

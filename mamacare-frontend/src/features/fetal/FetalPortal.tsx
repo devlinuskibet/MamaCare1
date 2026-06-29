@@ -3,6 +3,7 @@ import GestationalOverview from './GestationalOverview';
 import ScanGallery from './ScanGallery';
 import type { ScanData } from './ScanGallery';
 import AddScanModal from './AddScanModal';
+import ContractionTimer from './ContractionTimer';
 import KickCounter from './KickCounter';
 import ScanLightbox from './ScanLightbox';
 import { Plus, Activity, Ruler, Book, Image as ImageIcon } from 'lucide-react';
@@ -90,9 +91,7 @@ const FetalPortal = () => {
             )}
 
             {activeTab === 'contractions' && (
-                <div className="p-8 text-center text-slate-500 bg-white rounded-xl shadow-sm border border-slate-100">
-                    Contraction Timer Component (Coming Next)
-                </div>
+                <ContractionTimer />
             )}
 
             {activeTab === 'size' && (
