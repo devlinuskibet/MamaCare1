@@ -1,30 +1,58 @@
 import React, { useState } from 'react';
 
 // For simplicity, we just use some mock sizes for standard comparison
-const STANDARD_SIZES: Record<number, { name: string, detail: string }> = {
-    4: { name: 'Poppy Seed', detail: 'Your baby is the size of a poppy seed. The neural tube is forming.' },
-    12: { name: 'Plum', detail: 'Your baby is the size of a plum. All vital organs are formed.' },
-    24: { name: 'Cantaloupe', detail: 'Your baby is the size of a cantaloupe. The lungs are developing rapidly.' },
-    40: { name: 'Watermelon', detail: 'Your baby is the size of a small watermelon and ready to meet the world!' },
+const STANDARD_SIZES: Record<number, { name: string, detail: string, icon: string }> = {
+    4: { name: 'Poppy Seed', detail: 'Your baby is the size of a poppy seed. The neural tube is forming.', icon: '🌱' },
+    12: { name: 'Plum', detail: 'Your baby is the size of a plum. All vital organs are formed.', icon: '🍑' },
+    24: { name: 'Cantaloupe', detail: 'Your baby is the size of a cantaloupe. The lungs are developing rapidly.', icon: '🍈' },
+    40: { name: 'Watermelon', detail: 'Your baby is the size of a small watermelon and ready to meet the world!', icon: '🍉' },
+};
+
+const LOCALIZED_SIZES: Record<number, { name: string, detail: string, icon: string }> = {
+    4: { name: 'Millet Seed', detail: 'Your baby is the size of a millet seed. The neural tube is forming.', icon: '🌾' },
+    12: { name: 'Passion Fruit', detail: 'Your baby is the size of a passion fruit. All vital organs are formed.', icon: '🟠' },
+    24: { name: 'Mango', detail: 'Your baby is the size of a large mango. The lungs are developing rapidly.', icon: '🥭' },
+    40: { name: 'Maize Cob', detail: 'Your baby is the size of a mature maize cob and ready to meet the world!', icon: '🌽' },
 };
 
 const FetalSizeVisualizer = () => {
     const [week, setWeek] = useState<number>(12);
+    const [isLocalized, setIsLocalized] = useState<boolean>(false);
 
     // Get closest mock data
     const getComparison = () => {
-        if (week >= 40) return STANDARD_SIZES[40];
-        if (week >= 24) return STANDARD_SIZES[24];
-        if (week >= 12) return STANDARD_SIZES[12];
-        return STANDARD_SIZES[4];
+        const dataSet = isLocalized ? LOCALIZED_SIZES : STANDARD_SIZES;
+        if (week >= 40) return dataSet[40];
+        if (week >= 24) return dataSet[24];
+        if (week >= 12) return dataSet[12];
+        return dataSet[4];
     };
 
     const currentComparison = getComparison();
 
     return (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8">
-            <h2 className="text-2xl font-bold text-slate-800 mb-2">How Big is Baby?</h2>
-            <p className="text-slate-500 mb-8">Slide to see how your baby is growing week by week.</p>
+            <div className="flex flex-col md:flex-row md:items-start justify-between mb-8 gap-4">
+                <div>
+                    <h2 className="text-2xl font-bold text-slate-800 mb-2">How Big is Baby?</h2>
+                    <p className="text-slate-500">Slide to see how your baby is growing week by week.</p>
+                </div>
+                
+                <div className="flex items-center bg-slate-100 p-1 rounded-lg self-start">
+                    <button 
+                        onClick={() => setIsLocalized(false)}
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${!isLocalized ? 'bg-white shadow-sm text-pink-600' : 'text-slate-500 hover:text-slate-700'}`}
+                    >
+                        Standard
+                    </button>
+                    <button 
+                        onClick={() => setIsLocalized(true)}
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${isLocalized ? 'bg-white shadow-sm text-pink-600' : 'text-slate-500 hover:text-slate-700'}`}
+                    >
+                        Localized Kenya
+                    </button>
+                </div>
+            </div>
             
             <div className="mb-10">
                 <div className="flex justify-between text-slate-500 font-medium mb-2">
@@ -43,7 +71,7 @@ const FetalSizeVisualizer = () => {
             </div>
             
             <div className="bg-pink-50 rounded-xl p-8 text-center border border-pink-100">
-                <div className="text-6xl mb-4">🌱</div>
+                <div className="text-6xl mb-4">{currentComparison.icon}</div>
                 <h3 className="text-2xl font-bold text-slate-800 mb-2">The size of a {currentComparison.name}</h3>
                 <p className="text-slate-600">{currentComparison.detail}</p>
             </div>
