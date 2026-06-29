@@ -71,7 +71,7 @@ const FetalJournal = () => {
                     </div>
                 ) : (
                     <div className="relative border-l-2 border-pink-100 ml-4 space-y-8 pb-4 mt-2">
-                        {entries.map((entry, index) => (
+                        {entries.map((entry) => (
                             <div key={entry.id} className="relative pl-8">
                                 {/* Timeline Dot */}
                                 <div className="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-pink-500 ring-4 ring-white" />
