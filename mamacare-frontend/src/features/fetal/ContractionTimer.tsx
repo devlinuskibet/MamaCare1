@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Play, Square, AlertCircle } from 'lucide-react';
 
 export interface Contraction {
@@ -18,7 +18,7 @@ const ContractionTimer = () => {
     const [showHospitalAlert, setShowHospitalAlert] = useState(false);
 
     useEffect(() => {
-        let interval: NodeJS.Timeout;
+        let interval: ReturnType<typeof setInterval>;
         if (isTiming) {
             interval = setInterval(() => {
                 setActiveDuration(prev => prev + 1);
