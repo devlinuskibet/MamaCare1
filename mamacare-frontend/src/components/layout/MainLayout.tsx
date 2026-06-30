@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Menu, Home, Activity, MessageCircle, LogOut, Flower2, TrendingUp, User, Stethoscope, Users, FileText, Baby } from 'lucide-react';
+import { Menu, Home, Activity, MessageCircle, LogOut, Flower2, TrendingUp, User, Stethoscope, Users, FileText, Baby, Pill } from 'lucide-react';
 import { useUserRole } from '../../contexts/UserContext';
 
 interface MainLayoutProps {
@@ -19,6 +19,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     const motherNavItems = [
         { label: 'Dashboard', path: '/dashboard', icon: <Home size={20} /> },
         { label: 'Check Vitals', path: '/vitals', icon: <Activity size={20} /> },
+        { label: 'Nutrition & IFAS', path: '/dashboard/ifas-tracker', icon: <Pill size={20} /> },
         { label: 'MamaAI', path: '/chatbot', icon: <MessageCircle size={20} /> },
         { label: 'My History', path: '/history', icon: <TrendingUp size={20} /> },
         { label: 'Wellness', path: '/exercises', icon: <Flower2 size={20} /> },
