@@ -2,8 +2,8 @@ import { Info } from 'lucide-react';
 
 const EducationalTip = () => {
     return (
-        <div className="bg-indigo-50 rounded-2xl p-6 border border-indigo-100 flex items-start gap-4">
-            <div className="p-3 bg-indigo-100 text-indigo-600 rounded-xl shrink-0 mt-1">
+        <div className="bg-indigo-50 rounded-2xl p-5 md:p-6 border border-indigo-100 flex flex-col sm:flex-row items-start sm:items-center md:items-start gap-4 transition-all duration-300 hover:shadow-md">
+            <div className="p-3 bg-indigo-100 text-indigo-600 rounded-xl shrink-0 mt-1 sm:mt-0 md:mt-1">
                 <Info size={24} />
             </div>
             <div>
