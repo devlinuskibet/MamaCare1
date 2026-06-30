@@ -1,8 +1,10 @@
 import ComplianceProgress from './ComplianceProgress';
+import StreakCounter from './StreakCounter';
 
 const IFASTracker = () => {
     // Hardcoded mock data for now
     const compliancePercent = 85;
+    const currentStreak = 5;
 
     return (
         <div className="space-y-6 md:space-y-8 pb-12">
@@ -15,6 +17,7 @@ const IFASTracker = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <ComplianceProgress percentage={compliancePercent} />
+                <StreakCounter streak={currentStreak} />
             </div>
         </div>
     );
