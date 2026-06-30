@@ -46,13 +46,33 @@ const IFASTracker = () => {
         }));
     };
 
+    const handleReset = () => {
+        setLoggedDays({
+            'Mon': false,
+            'Tue': false,
+            'Wed': false,
+            'Thu': false,
+            'Fri': false,
+            'Sat': false,
+            'Sun': false
+        });
+    };
+
     return (
         <div className="space-y-6 md:space-y-8 pb-12">
-            <div className="mb-6 md:mb-8">
-                <h1 className="text-3xl font-bold text-slate-800">Nutrition & IFAS Tracker</h1>
-                <p className="text-slate-500 mt-2 text-base md:text-lg max-w-3xl">
-                    Daily Iron and Folic Acid Supplementation (IFAS) is critical during pregnancy. It prevents maternal anemia, reduces the risk of low birth weight, and protects your baby's spinal development.
-                </p>
+            <div className="mb-6 md:mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold text-slate-800">Nutrition & IFAS Tracker</h1>
+                    <p className="text-slate-500 mt-2 text-base md:text-lg max-w-3xl">
+                        Daily Iron and Folic Acid Supplementation (IFAS) is critical during pregnancy. It prevents maternal anemia, reduces the risk of low birth weight, and protects your baby's spinal development.
+                    </p>
+                </div>
+                <button 
+                    onClick={handleReset}
+                    className="self-start md:self-auto px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-sm font-medium transition-colors border border-slate-200"
+                >
+                    Reset Week
+                </button>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
