@@ -1,15 +1,29 @@
+import { useState } from 'react';
 import ComplianceProgress from './ComplianceProgress';
 import StreakCounter from './StreakCounter';
 import WeeklyCalendar from './WeeklyCalendar';
 
 const IFASTracker = () => {
+    // Initial state with some mock data
+    const [loggedDays, setLoggedDays] = useState<Record<string, boolean>>({
+        'Mon': true,
+        'Tue': true,
+        'Wed': false,
+        'Thu': false,
+        'Fri': false,
+        'Sat': false,
+        'Sun': false
+    });
+    
     // Hardcoded mock data for now
     const compliancePercent = 85;
     const currentStreak = 5;
     
-    // Mock handler for now
     const handleToggleDay = (day: string) => {
-        console.log("Toggled", day);
+        setLoggedDays(prev => ({
+            ...prev,
+            [day]: !prev[day]
+        }));
     };
 
     return (
@@ -23,7 +37,7 @@ const IFASTracker = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <WeeklyCalendar 
-                    loggedDays={{ 'Mon': true, 'Tue': true, 'Wed': false }} 
+                    loggedDays={loggedDays} 
                     onToggleDay={handleToggleDay} 
                 />
                 <ComplianceProgress percentage={compliancePercent} />
