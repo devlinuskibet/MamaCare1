@@ -2,6 +2,7 @@ import { useState } from 'react';
 import ComplianceProgress from './ComplianceProgress';
 import StreakCounter from './StreakCounter';
 import WeeklyCalendar from './WeeklyCalendar';
+import EducationalTip from './EducationalTip';
 
 const IFASTracker = () => {
     // Initial state with some mock data
@@ -54,7 +55,7 @@ const IFASTracker = () => {
                 </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 <WeeklyCalendar 
                     loggedDays={loggedDays} 
                     onToggleDay={handleToggleDay} 
@@ -62,6 +63,8 @@ const IFASTracker = () => {
                 <ComplianceProgress percentage={compliancePercent} />
                 <StreakCounter streak={currentStreak} />
             </div>
+
+            <EducationalTip />
         </div>
     );
 };
