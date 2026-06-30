@@ -15,9 +15,28 @@ const IFASTracker = () => {
         'Sun': false
     });
     
-    // Hardcoded mock data for now
-    const compliancePercent = 85;
-    const currentStreak = 5;
+    // Calculate metrics
+    const calculateMetrics = () => {
+        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        let takenCount = 0;
+        let streak = 0;
+        let currentStreak = 0;
+
+        for (const day of days) {
+            if (loggedDays[day]) {
+                takenCount++;
+                currentStreak++;
+                streak = Math.max(streak, currentStreak);
+            } else {
+                currentStreak = 0;
+            }
+        }
+
+        const percentage = Math.round((takenCount / 7) * 100);
+        return { percentage, streak };
+    };
+
+    const { percentage: compliancePercent, streak: currentStreak } = calculateMetrics();
     
     const handleToggleDay = (day: string) => {
         setLoggedDays(prev => ({
