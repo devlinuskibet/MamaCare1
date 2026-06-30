@@ -1,4 +1,9 @@
+import ComplianceProgress from './ComplianceProgress';
+
 const IFASTracker = () => {
+    // Hardcoded mock data for now
+    const compliancePercent = 85;
+
     return (
         <div className="space-y-6 md:space-y-8 pb-12">
             <div className="mb-6 md:mb-8">
@@ -8,8 +13,8 @@ const IFASTracker = () => {
                 </p>
             </div>
             
-            <div className="grid grid-cols-1 gap-6">
-                {/* Content will go here */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <ComplianceProgress percentage={compliancePercent} />
             </div>
         </div>
     );
