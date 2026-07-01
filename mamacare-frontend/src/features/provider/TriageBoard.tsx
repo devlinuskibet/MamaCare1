@@ -44,9 +44,17 @@ const TriageBoard = () => {
         if (selectedPatient?.id === patientId) setSelectedPatient(null);
     };
 
-    const criticalPatients = patients.filter(p => p.risk_level === 'critical' && p.status === 'waiting');
-    const monitorPatients = patients.filter(p => p.risk_level === 'monitor' && p.status === 'waiting');
-    const stablePatients = patients.filter(p => p.risk_level === 'stable' && p.status === 'waiting');
+    const criticalPatients = patients
+        .filter(p => p.risk_level === 'critical' && p.status === 'waiting')
+        .sort((a, b) => b.time_unattended - a.time_unattended);
+        
+    const monitorPatients = patients
+        .filter(p => p.risk_level === 'monitor' && p.status === 'waiting')
+        .sort((a, b) => b.time_unattended - a.time_unattended);
+        
+    const stablePatients = patients
+        .filter(p => p.risk_level === 'stable' && p.status === 'waiting')
+        .sort((a, b) => b.time_unattended - a.time_unattended);
 
     return (
         <div className="space-y-6 animate-in fade-in duration-300 h-full flex flex-col relative overflow-hidden">
@@ -103,8 +111,10 @@ const TriageBoard = () => {
                                 />
                             ))
                         ) : (
-                            <div className="flex-1 border-2 border-dashed border-red-200 rounded-xl flex items-center justify-center">
-                                <p className="text-red-400 font-medium">Empty</p>
+                            <div className="flex-1 rounded-xl flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-red-200/50">
+                                <CheckCircle2 className="text-red-300 mb-2" size={32} />
+                                <p className="text-red-400 font-medium">No Active Emergencies</p>
+                                <p className="text-red-300 text-sm mt-1">All critical patients are in treatment.</p>
                             </div>
                         )}
                     </div>
@@ -127,8 +137,10 @@ const TriageBoard = () => {
                                 />
                             ))
                         ) : (
-                            <div className="flex-1 border-2 border-dashed border-amber-200 rounded-xl flex items-center justify-center">
-                                <p className="text-amber-400 font-medium">Empty</p>
+                            <div className="flex-1 rounded-xl flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-amber-200/50">
+                                <CheckCircle2 className="text-amber-300 mb-2" size={32} />
+                                <p className="text-amber-400 font-medium">No Patients to Monitor</p>
+                                <p className="text-amber-300 text-sm mt-1">Queue is clear.</p>
                             </div>
                         )}
                     </div>
@@ -151,8 +163,10 @@ const TriageBoard = () => {
                                 />
                             ))
                         ) : (
-                            <div className="flex-1 border-2 border-dashed border-emerald-200 rounded-xl flex items-center justify-center">
-                                <p className="text-emerald-400 font-medium">Empty</p>
+                            <div className="flex-1 rounded-xl flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-emerald-200/50">
+                                <CheckCircle2 className="text-emerald-300 mb-2" size={32} />
+                                <p className="text-emerald-400 font-medium">No Stable Patients</p>
+                                <p className="text-emerald-300 text-sm mt-1">Queue is clear.</p>
                             </div>
                         )}
                     </div>
