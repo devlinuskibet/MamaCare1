@@ -33,9 +33,16 @@ const mockPatients: PatientTriageData[] = [
 const TriageBoard = () => {
     const [patients, setPatients] = useState<PatientTriageData[]>(mockPatients);
 
-    const criticalPatients = patients.filter(p => p.risk_level === 'critical');
-    const monitorPatients = patients.filter(p => p.risk_level === 'monitor');
-    const stablePatients = patients.filter(p => p.risk_level === 'stable');
+    const handleAcknowledge = (e: React.MouseEvent, patientId: string) => {
+        e.stopPropagation();
+        setPatients(prev => prev.map(p => 
+            p.id === patientId ? { ...p, status: 'in_treatment' } : p
+        ));
+    };
+
+    const criticalPatients = patients.filter(p => p.risk_level === 'critical' && p.status === 'waiting');
+    const monitorPatients = patients.filter(p => p.risk_level === 'monitor' && p.status === 'waiting');
+    const stablePatients = patients.filter(p => p.risk_level === 'stable' && p.status === 'waiting');
 
     return (
         <div className="space-y-6 animate-in fade-in duration-300 h-full flex flex-col">
@@ -52,7 +59,7 @@ const TriageBoard = () => {
                         <AlertCircle className="text-red-600" size={24} />
                         <div>
                             <p className="text-xs font-semibold text-red-600 uppercase tracking-wider">Active Emergencies</p>
-                            <p className="text-2xl font-bold text-red-700">{criticalPatients.filter(p => p.status === 'waiting').length}</p>
+                            <p className="text-2xl font-bold text-red-700">{criticalPatients.length}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3 bg-amber-50 border border-amber-100 px-4 py-3 rounded-xl min-w-fit">
@@ -88,6 +95,7 @@ const TriageBoard = () => {
                                     key={patient.id} 
                                     patient={patient} 
                                     onClick={() => console.log('clicked', patient.name)}
+                                    onAcknowledge={(e) => handleAcknowledge(e, patient.id)}
                                 />
                             ))
                         ) : (
@@ -111,6 +119,7 @@ const TriageBoard = () => {
                                     key={patient.id} 
                                     patient={patient} 
                                     onClick={() => console.log('clicked', patient.name)}
+                                    onAcknowledge={(e) => handleAcknowledge(e, patient.id)}
                                 />
                             ))
                         ) : (
@@ -134,6 +143,7 @@ const TriageBoard = () => {
                                     key={patient.id} 
                                     patient={patient} 
                                     onClick={() => console.log('clicked', patient.name)}
+                                    onAcknowledge={(e) => handleAcknowledge(e, patient.id)}
                                 />
                             ))
                         ) : (
