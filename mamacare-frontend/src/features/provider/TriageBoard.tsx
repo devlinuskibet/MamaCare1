@@ -92,10 +92,10 @@ const TriageBoard = () => {
             </div>
             
             {/* Triage Board Area */}
-            <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="flex-1 flex lg:grid lg:grid-cols-3 gap-6 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0 snap-x snap-mandatory">
                 
                 {/* 1. Critical / High Risk */}
-                <div className="bg-red-50/50 rounded-2xl border border-red-200 flex flex-col overflow-hidden">
+                <div className="min-w-[320px] w-full lg:min-w-0 lg:w-auto shrink-0 snap-center bg-red-50/50 rounded-2xl border border-red-200 flex flex-col overflow-hidden transition-all duration-300">
                     <div className="bg-red-600 px-4 py-3 flex items-center justify-between shadow-sm">
                         <h2 className="text-white font-bold tracking-wide">Critical / High Risk</h2>
                         <span className="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-lg">{criticalPatients.length}</span>
@@ -121,7 +121,7 @@ const TriageBoard = () => {
                 </div>
 
                 {/* 2. Monitor / Mid Risk */}
-                <div className="bg-amber-50/50 rounded-2xl border border-amber-200 flex flex-col overflow-hidden">
+                <div className="min-w-[320px] w-full lg:min-w-0 lg:w-auto shrink-0 snap-center bg-amber-50/50 rounded-2xl border border-amber-200 flex flex-col overflow-hidden transition-all duration-300">
                     <div className="bg-amber-500 px-4 py-3 flex items-center justify-between shadow-sm">
                         <h2 className="text-white font-bold tracking-wide">Monitor / Mid Risk</h2>
                         <span className="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-lg">{monitorPatients.length}</span>
@@ -147,7 +147,7 @@ const TriageBoard = () => {
                 </div>
 
                 {/* 3. Stable */}
-                <div className="bg-emerald-50/50 rounded-2xl border border-emerald-200 flex flex-col overflow-hidden">
+                <div className="min-w-[320px] w-full lg:min-w-0 lg:w-auto shrink-0 snap-center bg-emerald-50/50 rounded-2xl border border-emerald-200 flex flex-col overflow-hidden transition-all duration-300">
                     <div className="bg-emerald-600 px-4 py-3 flex items-center justify-between shadow-sm">
                         <h2 className="text-white font-bold tracking-wide">Stable</h2>
                         <span className="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-lg">{stablePatients.length}</span>
