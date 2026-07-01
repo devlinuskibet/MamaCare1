@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AlertCircle, Clock, CheckCircle2 } from 'lucide-react';
-import PatientTriageCard, { PatientTriageData } from './PatientTriageCard';
+import PatientTriageCard from './PatientTriageCard';
+import type { PatientTriageData } from './PatientTriageCard';
 
 import PatientQuickView from './PatientQuickView';
 
