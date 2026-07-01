@@ -37,9 +37,50 @@ const TriageBoard = () => {
                 </div>
             </div>
             
-            {/* Triage Board Area (to be implemented) */}
-            <div className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 p-6 flex items-center justify-center">
-                <p className="text-slate-400">Triage columns will go here...</p>
+            {/* Triage Board Area */}
+            <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                {/* 1. Critical / High Risk */}
+                <div className="bg-red-50/50 rounded-2xl border border-red-200 flex flex-col overflow-hidden">
+                    <div className="bg-red-600 px-4 py-3 flex items-center justify-between shadow-sm">
+                        <h2 className="text-white font-bold tracking-wide">Critical / High Risk</h2>
+                        <span className="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-lg">2</span>
+                    </div>
+                    <div className="flex-1 p-4 flex flex-col gap-4 overflow-y-auto min-h-[400px]">
+                        {/* Cards will go here */}
+                        <div className="flex-1 border-2 border-dashed border-red-200 rounded-xl flex items-center justify-center">
+                            <p className="text-red-400 font-medium">Empty</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 2. Monitor / Mid Risk */}
+                <div className="bg-amber-50/50 rounded-2xl border border-amber-200 flex flex-col overflow-hidden">
+                    <div className="bg-amber-500 px-4 py-3 flex items-center justify-between shadow-sm">
+                        <h2 className="text-white font-bold tracking-wide">Monitor / Mid Risk</h2>
+                        <span className="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-lg">5</span>
+                    </div>
+                    <div className="flex-1 p-4 flex flex-col gap-4 overflow-y-auto min-h-[400px]">
+                        {/* Cards will go here */}
+                        <div className="flex-1 border-2 border-dashed border-amber-200 rounded-xl flex items-center justify-center">
+                            <p className="text-amber-400 font-medium">Empty</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 3. Stable */}
+                <div className="bg-emerald-50/50 rounded-2xl border border-emerald-200 flex flex-col overflow-hidden">
+                    <div className="bg-emerald-600 px-4 py-3 flex items-center justify-between shadow-sm">
+                        <h2 className="text-white font-bold tracking-wide">Stable</h2>
+                        <span className="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-lg">14</span>
+                    </div>
+                    <div className="flex-1 p-4 flex flex-col gap-4 overflow-y-auto min-h-[400px]">
+                        {/* Cards will go here */}
+                        <div className="flex-1 border-2 border-dashed border-emerald-200 rounded-xl flex items-center justify-center">
+                            <p className="text-emerald-400 font-medium">Empty</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
