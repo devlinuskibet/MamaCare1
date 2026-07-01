@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { AlertCircle, Clock, CheckCircle2 } from 'lucide-react';
 import PatientTriageCard, { PatientTriageData } from './PatientTriageCard';
 
+import PatientQuickView from './PatientQuickView';
+
 const mockPatients: PatientTriageData[] = [
     {
         id: '1', name: 'Sarah Jenkins', age: 28, risk_level: 'critical',
@@ -32,12 +34,14 @@ const mockPatients: PatientTriageData[] = [
 
 const TriageBoard = () => {
     const [patients, setPatients] = useState<PatientTriageData[]>(mockPatients);
+    const [selectedPatient, setSelectedPatient] = useState<PatientTriageData | null>(null);
 
     const handleAcknowledge = (e: React.MouseEvent, patientId: string) => {
         e.stopPropagation();
         setPatients(prev => prev.map(p => 
             p.id === patientId ? { ...p, status: 'in_treatment' } : p
         ));
+        if (selectedPatient?.id === patientId) setSelectedPatient(null);
     };
 
     const criticalPatients = patients.filter(p => p.risk_level === 'critical' && p.status === 'waiting');
@@ -45,7 +49,7 @@ const TriageBoard = () => {
     const stablePatients = patients.filter(p => p.risk_level === 'stable' && p.status === 'waiting');
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-300 h-full flex flex-col">
+        <div className="space-y-6 animate-in fade-in duration-300 h-full flex flex-col relative overflow-hidden">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <div>
@@ -94,7 +98,7 @@ const TriageBoard = () => {
                                 <PatientTriageCard 
                                     key={patient.id} 
                                     patient={patient} 
-                                    onClick={() => console.log('clicked', patient.name)}
+                                    onClick={() => setSelectedPatient(patient)}
                                     onAcknowledge={(e) => handleAcknowledge(e, patient.id)}
                                 />
                             ))
@@ -118,7 +122,7 @@ const TriageBoard = () => {
                                 <PatientTriageCard 
                                     key={patient.id} 
                                     patient={patient} 
-                                    onClick={() => console.log('clicked', patient.name)}
+                                    onClick={() => setSelectedPatient(patient)}
                                     onAcknowledge={(e) => handleAcknowledge(e, patient.id)}
                                 />
                             ))
@@ -142,7 +146,7 @@ const TriageBoard = () => {
                                 <PatientTriageCard 
                                     key={patient.id} 
                                     patient={patient} 
-                                    onClick={() => console.log('clicked', patient.name)}
+                                    onClick={() => setSelectedPatient(patient)}
                                     onAcknowledge={(e) => handleAcknowledge(e, patient.id)}
                                 />
                             ))
@@ -154,6 +158,11 @@ const TriageBoard = () => {
                     </div>
                 </div>
             </div>
+
+            <PatientQuickView 
+                patient={selectedPatient} 
+                onClose={() => setSelectedPatient(null)} 
+            />
         </div>
     );
 };
