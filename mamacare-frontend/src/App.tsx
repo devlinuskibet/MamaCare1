@@ -16,6 +16,7 @@ import { UserProvider } from './contexts/UserContext';
 import PatientDirectory from './features/provider/PatientDirectory';
 import ProfilePage from './features/common/ProfilePage';
 import ReportsDashboard from './features/provider/ReportsDashboard';
+import TriageBoard from './features/provider/TriageBoard';
 import { Navigate } from 'react-router-dom';
 import { useUserRole } from './contexts/UserContext';
 import ConsentOverlay from './features/common/ConsentOverlay';
@@ -66,6 +67,7 @@ function App() {
 
                     {/* Provider Routes (Ideally protected by role, but open for now) */}
                     <Route path="/provider" element={<MainLayout><ProviderDashboard /></MainLayout>} />
+                    <Route path="/provider/triage" element={<MainLayout><TriageBoard /></MainLayout>} />
                     <Route path="/provider/patients" element={<MainLayout><PatientDirectory /></MainLayout>} />
                     <Route path="/patient/:id" element={<MainLayout><PatientDetails /></MainLayout>} />
                     <Route path="/provider/reports" element={<MainLayout><ReportsDashboard /></MainLayout>} />

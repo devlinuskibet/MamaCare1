@@ -30,6 +30,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     // Provider Navigation Items
     const providerNavItems = [
         { label: 'Triage Dashboard', path: '/provider', icon: <Home size={20} /> },
+        { label: 'Live Triage Board', path: '/provider/triage', icon: <Activity size={20} /> },
         { label: 'Patient Directory', path: '/provider/patients', icon: <Users size={20} /> },
         { label: 'Reports', path: '/provider/reports', icon: <FileText size={20} /> }, // Placeholder route
         { label: 'Doctor Profile', path: '/profile', icon: <Stethoscope size={20} /> },
