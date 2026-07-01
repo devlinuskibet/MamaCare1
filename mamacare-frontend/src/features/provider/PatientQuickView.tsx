@@ -1,6 +1,6 @@
 import React from 'react';
-import { X, HeartPulse, Activity, Calendar, History, ShieldAlert } from 'lucide-react';
-import { PatientTriageData } from './PatientTriageCard';
+import { X, HeartPulse, Activity, History, ShieldAlert } from 'lucide-react';
+import type { PatientTriageData } from './PatientTriageCard';
 
 interface PatientQuickViewProps {
     patient: PatientTriageData | null;
