@@ -41,7 +41,7 @@ const PatientTriageCard: React.FC<PatientTriageCardProps> = ({ patient, onClick,
             className={`
                 group p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 relative shadow-sm hover:shadow-md
                 ${riskStyles[patient.risk_level]}
-                ${isCriticalTime ? 'animate-pulse ring-4 ring-red-500/30' : ''}
+                ${isCriticalTime ? 'animate-[pulse_1s_ease-in-out_infinite] ring-4 ring-red-500/50 shadow-red-500/50' : ''}
             `}
         >
             <div className="flex justify-between items-start mb-3">
