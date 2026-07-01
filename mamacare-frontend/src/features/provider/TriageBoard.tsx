@@ -1,7 +1,42 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AlertCircle, Clock, CheckCircle2 } from 'lucide-react';
+import PatientTriageCard, { PatientTriageData } from './PatientTriageCard';
+
+const mockPatients: PatientTriageData[] = [
+    {
+        id: '1', name: 'Sarah Jenkins', age: 28, risk_level: 'critical',
+        primary_flag: 'BP 160/110, Severe Headache', time_unattended: 6,
+        gravida_parity: 'G1P0', status: 'waiting'
+    },
+    {
+        id: '2', name: 'Maria Garcia', age: 34, risk_level: 'monitor',
+        primary_flag: 'Decreased Fetal Movement', time_unattended: 12,
+        gravida_parity: 'G3P2', status: 'waiting'
+    },
+    {
+        id: '3', name: 'Emily Chen', age: 31, risk_level: 'stable',
+        primary_flag: 'Routine Checkup, Mild Nausea', time_unattended: 25,
+        gravida_parity: 'G2P1', status: 'waiting'
+    },
+    {
+        id: '4', name: 'Aisha Patel', age: 25, risk_level: 'monitor',
+        primary_flag: 'Spotting, Mild Cramps', time_unattended: 4,
+        gravida_parity: 'G1P0', status: 'waiting'
+    },
+    {
+        id: '5', name: 'Chloe Dubois', age: 30, risk_level: 'critical',
+        primary_flag: 'Contractions 3 mins apart', time_unattended: 2,
+        gravida_parity: 'G2P1', status: 'waiting'
+    }
+];
 
 const TriageBoard = () => {
+    const [patients, setPatients] = useState<PatientTriageData[]>(mockPatients);
+
+    const criticalPatients = patients.filter(p => p.risk_level === 'critical');
+    const monitorPatients = patients.filter(p => p.risk_level === 'monitor');
+    const stablePatients = patients.filter(p => p.risk_level === 'stable');
+
     return (
         <div className="space-y-6 animate-in fade-in duration-300 h-full flex flex-col">
             {/* Header Section */}
@@ -17,14 +52,14 @@ const TriageBoard = () => {
                         <AlertCircle className="text-red-600" size={24} />
                         <div>
                             <p className="text-xs font-semibold text-red-600 uppercase tracking-wider">Active Emergencies</p>
-                            <p className="text-2xl font-bold text-red-700">2</p>
+                            <p className="text-2xl font-bold text-red-700">{criticalPatients.filter(p => p.status === 'waiting').length}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3 bg-amber-50 border border-amber-100 px-4 py-3 rounded-xl min-w-fit">
                         <Clock className="text-amber-600" size={24} />
                         <div>
                             <p className="text-xs font-semibold text-amber-600 uppercase tracking-wider">Awaiting Triage</p>
-                            <p className="text-2xl font-bold text-amber-700">5</p>
+                            <p className="text-2xl font-bold text-amber-700">{patients.filter(p => p.status === 'waiting').length}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-100 px-4 py-3 rounded-xl min-w-fit">
@@ -44,13 +79,22 @@ const TriageBoard = () => {
                 <div className="bg-red-50/50 rounded-2xl border border-red-200 flex flex-col overflow-hidden">
                     <div className="bg-red-600 px-4 py-3 flex items-center justify-between shadow-sm">
                         <h2 className="text-white font-bold tracking-wide">Critical / High Risk</h2>
-                        <span className="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-lg">2</span>
+                        <span className="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-lg">{criticalPatients.length}</span>
                     </div>
                     <div className="flex-1 p-4 flex flex-col gap-4 overflow-y-auto min-h-[400px]">
-                        {/* Cards will go here */}
-                        <div className="flex-1 border-2 border-dashed border-red-200 rounded-xl flex items-center justify-center">
-                            <p className="text-red-400 font-medium">Empty</p>
-                        </div>
+                        {criticalPatients.length > 0 ? (
+                            criticalPatients.map(patient => (
+                                <PatientTriageCard 
+                                    key={patient.id} 
+                                    patient={patient} 
+                                    onClick={() => console.log('clicked', patient.name)}
+                                />
+                            ))
+                        ) : (
+                            <div className="flex-1 border-2 border-dashed border-red-200 rounded-xl flex items-center justify-center">
+                                <p className="text-red-400 font-medium">Empty</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -58,13 +102,22 @@ const TriageBoard = () => {
                 <div className="bg-amber-50/50 rounded-2xl border border-amber-200 flex flex-col overflow-hidden">
                     <div className="bg-amber-500 px-4 py-3 flex items-center justify-between shadow-sm">
                         <h2 className="text-white font-bold tracking-wide">Monitor / Mid Risk</h2>
-                        <span className="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-lg">5</span>
+                        <span className="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-lg">{monitorPatients.length}</span>
                     </div>
                     <div className="flex-1 p-4 flex flex-col gap-4 overflow-y-auto min-h-[400px]">
-                        {/* Cards will go here */}
-                        <div className="flex-1 border-2 border-dashed border-amber-200 rounded-xl flex items-center justify-center">
-                            <p className="text-amber-400 font-medium">Empty</p>
-                        </div>
+                        {monitorPatients.length > 0 ? (
+                            monitorPatients.map(patient => (
+                                <PatientTriageCard 
+                                    key={patient.id} 
+                                    patient={patient} 
+                                    onClick={() => console.log('clicked', patient.name)}
+                                />
+                            ))
+                        ) : (
+                            <div className="flex-1 border-2 border-dashed border-amber-200 rounded-xl flex items-center justify-center">
+                                <p className="text-amber-400 font-medium">Empty</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -72,13 +125,22 @@ const TriageBoard = () => {
                 <div className="bg-emerald-50/50 rounded-2xl border border-emerald-200 flex flex-col overflow-hidden">
                     <div className="bg-emerald-600 px-4 py-3 flex items-center justify-between shadow-sm">
                         <h2 className="text-white font-bold tracking-wide">Stable</h2>
-                        <span className="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-lg">14</span>
+                        <span className="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-lg">{stablePatients.length}</span>
                     </div>
                     <div className="flex-1 p-4 flex flex-col gap-4 overflow-y-auto min-h-[400px]">
-                        {/* Cards will go here */}
-                        <div className="flex-1 border-2 border-dashed border-emerald-200 rounded-xl flex items-center justify-center">
-                            <p className="text-emerald-400 font-medium">Empty</p>
-                        </div>
+                        {stablePatients.length > 0 ? (
+                            stablePatients.map(patient => (
+                                <PatientTriageCard 
+                                    key={patient.id} 
+                                    patient={patient} 
+                                    onClick={() => console.log('clicked', patient.name)}
+                                />
+                            ))
+                        ) : (
+                            <div className="flex-1 border-2 border-dashed border-emerald-200 rounded-xl flex items-center justify-center">
+                                <p className="text-emerald-400 font-medium">Empty</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
