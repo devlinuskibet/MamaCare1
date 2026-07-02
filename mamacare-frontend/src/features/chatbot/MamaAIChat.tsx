@@ -24,6 +24,43 @@ const MamaAIChat = () => {
         scrollToBottom();
     }, [messages]);
 
+    const simulateSSE = () => {
+        const responseText = "I can certainly help with that! It's completely normal to experience those symptoms during your second trimester. However, if the pain becomes severe or is accompanied by fever, please contact your provider immediately.";
+        const words = responseText.split(' ');
+        
+        const aiMessageId = Date.now().toString() + '-ai';
+        const newAiMessage: Message = {
+            id: aiMessageId,
+            text: '',
+            sender: 'ai',
+            timestamp: new Date(),
+            isStreaming: true
+        };
+
+        setMessages(prev => [...prev, newAiMessage]);
+
+        let currentIndex = 0;
+        const intervalId = setInterval(() => {
+            if (currentIndex < words.length) {
+                setMessages(prev => prev.map(msg => {
+                    if (msg.id === aiMessageId) {
+                        return {
+                            ...msg,
+                            text: msg.text + (currentIndex === 0 ? '' : ' ') + words[currentIndex]
+                        };
+                    }
+                    return msg;
+                }));
+                currentIndex++;
+            } else {
+                clearInterval(intervalId);
+                setMessages(prev => prev.map(msg => 
+                    msg.id === aiMessageId ? { ...msg, isStreaming: false } : msg
+                ));
+            }
+        }, 100); // 100ms per word
+    };
+
     const handleSend = () => {
         if (!inputValue.trim()) return;
 
@@ -36,6 +73,11 @@ const MamaAIChat = () => {
 
         setMessages(prev => [...prev, newUserMessage]);
         setInputValue('');
+
+        // Trigger SSE simulation after a brief delay
+        setTimeout(() => {
+            simulateSSE();
+        }, 500);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
