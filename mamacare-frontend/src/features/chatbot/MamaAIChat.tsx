@@ -13,6 +13,28 @@ const initialMessages: Message[] = [
 
 const MamaAIChat = () => {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
+    const [inputValue, setInputValue] = useState('');
+
+    const handleSend = () => {
+        if (!inputValue.trim()) return;
+
+        const newUserMessage: Message = {
+            id: Date.now().toString(),
+            text: inputValue.trim(),
+            sender: 'user',
+            timestamp: new Date()
+        };
+
+        setMessages(prev => [...prev, newUserMessage]);
+        setInputValue('');
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+        }
+    };
 
     return (
         <div className="flex flex-col h-[calc(100vh-8rem)] lg:h-[calc(100vh-6rem)] bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
@@ -38,11 +60,17 @@ const MamaAIChat = () => {
             <div className="p-4 bg-white border-t border-slate-100 shrink-0">
                 <div className="relative max-w-4xl mx-auto flex items-end gap-2">
                     <textarea 
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyDown={handleKeyDown}
                         className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:bg-white resize-none h-[52px] max-h-32 text-slate-700 placeholder:text-slate-400"
                         placeholder="Ask MamaAI a question..."
                         rows={1}
                     />
-                    <button className="h-[52px] w-[52px] shrink-0 bg-pink-600 hover:bg-pink-700 text-white rounded-2xl flex items-center justify-center transition-colors shadow-sm">
+                    <button 
+                        onClick={handleSend}
+                        className="h-[52px] w-[52px] shrink-0 bg-pink-600 hover:bg-pink-700 text-white rounded-2xl flex items-center justify-center transition-colors shadow-sm"
+                    >
                         <Send size={20} className="ml-1" />
                     </button>
                 </div>
