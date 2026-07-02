@@ -14,6 +14,7 @@ const initialMessages: Message[] = [
 const MamaAIChat = () => {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [inputValue, setInputValue] = useState('');
+    const [isThinking, setIsThinking] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -22,9 +23,10 @@ const MamaAIChat = () => {
 
     useEffect(() => {
         scrollToBottom();
-    }, [messages]);
+    }, [messages, isThinking]);
 
     const simulateSSE = () => {
+        setIsThinking(false);
         const responseText = "I can certainly help with that! It's completely normal to experience those symptoms during your second trimester. However, if the pain becomes severe or is accompanied by fever, please contact your provider immediately.";
         const words = responseText.split(' ');
         
@@ -73,11 +75,12 @@ const MamaAIChat = () => {
 
         setMessages(prev => [...prev, newUserMessage]);
         setInputValue('');
+        setIsThinking(true);
 
         // Trigger SSE simulation after a brief delay
         setTimeout(() => {
             simulateSSE();
-        }, 500);
+        }, 1500);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -105,6 +108,24 @@ const MamaAIChat = () => {
                 {messages.map(msg => (
                     <MessageBubble key={msg.id} message={msg} />
                 ))}
+                
+                {isThinking && (
+                    <div className="flex justify-start animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <div className="flex gap-2 flex-row max-w-[75%]">
+                            <div className="shrink-0 mt-auto mb-1">
+                                <div className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-600">
+                                    <Sparkles size={16} />
+                                </div>
+                            </div>
+                            <div className="bg-white border border-slate-200 rounded-2xl rounded-bl-sm px-4 py-4 shadow-sm flex items-center gap-1.5 h-12">
+                                <span className="w-2 h-2 bg-slate-300 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                                <span className="w-2 h-2 bg-slate-300 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                                <span className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" />
+                            </div>
+                        </div>
+                    </div>
+                )}
+                
                 <div ref={messagesEndRef} />
             </div>
 
