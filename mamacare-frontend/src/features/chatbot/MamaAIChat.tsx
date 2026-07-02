@@ -119,7 +119,7 @@ const MamaAIChat = () => {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-8rem)] lg:h-[calc(100vh-6rem)] bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
+        <div className="flex flex-col h-[calc(100dvh-8rem)] lg:h-[calc(100dvh-6rem)] bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
             {/* Header */}
             <div className="flex items-center gap-3 px-6 py-4 bg-white border-b border-slate-100 z-10 shrink-0">
                 <div className="p-2 bg-pink-100 rounded-xl">
@@ -160,12 +160,12 @@ const MamaAIChat = () => {
             {/* Sticky Input Footer */}
             <div className="p-4 bg-white border-t border-slate-100 shrink-0">
                 {/* Quick Replies */}
-                <div className="flex gap-2 overflow-x-auto pb-3 mb-1 snap-x no-scrollbar">
+                <div className="flex gap-2 overflow-x-auto pb-3 mb-1 snap-x scrollbar-hide">
                     {quickReplies.map((reply, idx) => (
                         <button 
                             key={idx}
                             onClick={() => handleQuickReply(reply)}
-                            className="shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium px-4 py-2 rounded-full transition-colors snap-start"
+                            className="shrink-0 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 text-xs font-medium px-4 py-2 rounded-full transition-all snap-start"
                         >
                             {reply}
                         </button>
@@ -183,7 +183,7 @@ const MamaAIChat = () => {
                     />
                     <button 
                         onClick={handleSend}
-                        className="h-[52px] w-[52px] shrink-0 bg-pink-600 hover:bg-pink-700 text-white rounded-2xl flex items-center justify-center transition-colors shadow-sm"
+                        className="h-[52px] w-[52px] shrink-0 bg-pink-600 hover:bg-pink-700 active:bg-pink-800 text-white rounded-2xl flex items-center justify-center transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
                     >
                         <Send size={20} className="ml-1" />
                     </button>
