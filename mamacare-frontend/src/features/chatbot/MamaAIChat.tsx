@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles } from 'lucide-react';
 import MessageBubble, { Message } from './MessageBubble';
 
@@ -14,6 +14,15 @@ const initialMessages: Message[] = [
 const MamaAIChat = () => {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [inputValue, setInputValue] = useState('');
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
     const handleSend = () => {
         if (!inputValue.trim()) return;
@@ -54,6 +63,7 @@ const MamaAIChat = () => {
                 {messages.map(msg => (
                     <MessageBubble key={msg.id} message={msg} />
                 ))}
+                <div ref={messagesEndRef} />
             </div>
 
             {/* Sticky Input Footer */}
