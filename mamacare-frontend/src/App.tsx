@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from './components/layout/MainLayout';
 import MotherDashboard from './features/dashboard/MotherDashboard';
 import VitalsForm from './features/triage/VitalsForm';
-import ChatWindow from './features/chatbot/ChatWindow';
+import MamaAIChat from './features/chatbot/MamaAIChat';
 import ProviderDashboard from './features/provider/ProviderDashboard';
 import HealthHistory from './features/dashboard/HealthHistory';
 import LoginPage from './features/auth/LoginPage';
@@ -58,7 +58,7 @@ function App() {
                     {/* Protected Routes (Wrapped in MainLayout and Gatekeeper) */}
                     <Route path="/dashboard" element={<ProtectedRoute><MainLayout><MotherDashboard /></MainLayout></ProtectedRoute>} />
                     <Route path="/vitals" element={<ProtectedRoute><MainLayout><VitalsForm /></MainLayout></ProtectedRoute>} />
-                    <Route path="/chatbot" element={<ProtectedRoute><MainLayout><ChatWindow /></MainLayout></ProtectedRoute>} />
+                    <Route path="/dashboard/mama-ai" element={<ProtectedRoute><MainLayout><MamaAIChat /></MainLayout></ProtectedRoute>} />
                     <Route path="/history" element={<ProtectedRoute><MainLayout><HealthHistory /></MainLayout></ProtectedRoute>} />
                     <Route path="/exercises" element={<ProtectedRoute><MainLayout><ExercisesPage /></MainLayout></ProtectedRoute>} />
                     <Route path="/dashboard/baby-portal" element={<ProtectedRoute><MainLayout><FetalPortal /></MainLayout></ProtectedRoute>} />
