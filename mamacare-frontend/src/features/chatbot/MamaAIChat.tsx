@@ -90,6 +90,34 @@ const MamaAIChat = () => {
         }
     };
 
+    const quickReplies = [
+        "Is my blood pressure normal?",
+        "What are signs of pre-eclampsia?",
+        "How often should my baby kick?",
+        "Is this contraction real or Braxton Hicks?"
+    ];
+
+    const handleQuickReply = (reply: string) => {
+        setInputValue(reply);
+        // We need to set state and then immediately trigger send. 
+        // Best way is to directly trigger the send logic with the reply text.
+        
+        const newUserMessage: Message = {
+            id: Date.now().toString(),
+            text: reply,
+            sender: 'user',
+            timestamp: new Date()
+        };
+
+        setMessages(prev => [...prev, newUserMessage]);
+        setInputValue('');
+        setIsThinking(true);
+
+        setTimeout(() => {
+            simulateSSE();
+        }, 1500);
+    };
+
     return (
         <div className="flex flex-col h-[calc(100vh-8rem)] lg:h-[calc(100vh-6rem)] bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
             {/* Header */}
@@ -131,6 +159,19 @@ const MamaAIChat = () => {
 
             {/* Sticky Input Footer */}
             <div className="p-4 bg-white border-t border-slate-100 shrink-0">
+                {/* Quick Replies */}
+                <div className="flex gap-2 overflow-x-auto pb-3 mb-1 snap-x no-scrollbar">
+                    {quickReplies.map((reply, idx) => (
+                        <button 
+                            key={idx}
+                            onClick={() => handleQuickReply(reply)}
+                            className="shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium px-4 py-2 rounded-full transition-colors snap-start"
+                        >
+                            {reply}
+                        </button>
+                    ))}
+                </div>
+
                 <div className="relative max-w-4xl mx-auto flex items-end gap-2">
                     <textarea 
                         value={inputValue}
