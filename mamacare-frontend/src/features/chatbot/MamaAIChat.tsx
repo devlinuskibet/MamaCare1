@@ -1,7 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Send, Sparkles } from 'lucide-react';
+import MessageBubble, { Message } from './MessageBubble';
+
+const initialMessages: Message[] = [
+    {
+        id: '1',
+        text: "Hi there! I'm MamaAI, your personal pregnancy assistant. I can help answer questions about your health, baby's development, or clinic appointments. What's on your mind today?",
+        sender: 'ai',
+        timestamp: new Date(Date.now() - 1000 * 60 * 5)
+    }
+];
 
 const MamaAIChat = () => {
+    const [messages, setMessages] = useState<Message[]>(initialMessages);
+
     return (
         <div className="flex flex-col h-[calc(100vh-8rem)] lg:h-[calc(100vh-6rem)] bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
             {/* Header */}
@@ -17,7 +29,9 @@ const MamaAIChat = () => {
 
             {/* Scrollable Message Area */}
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-50 space-y-6">
-                <p className="text-center text-sm text-slate-400 my-4">Chat history will appear here...</p>
+                {messages.map(msg => (
+                    <MessageBubble key={msg.id} message={msg} />
+                ))}
             </div>
 
             {/* Sticky Input Footer */}
