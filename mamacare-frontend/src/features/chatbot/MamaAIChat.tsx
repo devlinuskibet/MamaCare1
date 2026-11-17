@@ -1,13 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles } from 'lucide-react';
-import MessageBubble, { Message } from './MessageBubble';
+import MessageBubble, { type Message } from './MessageBubble';
+import { chatApi } from '../../api/chat';
+
+const rawApiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+const API_BASE = rawApiUrl.replace(/\/api\/?$/, '');
 
 const initialMessages: Message[] = [
     {
         id: '1',
-        text: "Hi there! I'm MamaAI, your personal pregnancy assistant. I can help answer questions about your health, baby's development, or clinic appointments. What's on your mind today?",
+        text: "Hi there! I'm MamaAI, your personal pregnancy assistant. I can help answer questions about your health, baby's development, or clinic appointments. What's on your mind today? 🌸",
         sender: 'ai',
-        timestamp: new Date(Date.now() - 1000 * 60 * 5)
+        timestamp: new Date()
     }
 ];
 
@@ -25,50 +29,34 @@ const MamaAIChat = () => {
         scrollToBottom();
     }, [messages, isThinking]);
 
-    const simulateSSE = () => {
-        setIsThinking(false);
-        const responseText = "I can certainly help with that! It's completely normal to experience those symptoms during your second trimester. However, if the pain becomes severe or is accompanied by fever, please contact your provider immediately.";
-        const words = responseText.split(' ');
-        
-        const aiMessageId = Date.now().toString() + '-ai';
-        const newAiMessage: Message = {
-            id: aiMessageId,
-            text: '',
-            sender: 'ai',
-            timestamp: new Date(),
-            isStreaming: true
-        };
-
-        setMessages(prev => [...prev, newAiMessage]);
-
-        let currentIndex = 0;
-        const intervalId = setInterval(() => {
-            if (currentIndex < words.length) {
-                setMessages(prev => prev.map(msg => {
-                    if (msg.id === aiMessageId) {
-                        return {
-                            ...msg,
-                            text: msg.text + (currentIndex === 0 ? '' : ' ') + words[currentIndex]
-                        };
-                    }
-                    return msg;
-                }));
-                currentIndex++;
-            } else {
-                clearInterval(intervalId);
-                setMessages(prev => prev.map(msg => 
-                    msg.id === aiMessageId ? { ...msg, isStreaming: false } : msg
-                ));
+    useEffect(() => {
+        const loadHistory = async () => {
+            try {
+                const history = await chatApi.getHistory();
+                if (history && history.length > 0) {
+                    const formatted: Message[] = history.map((m: any, idx: number) => ({
+                        id: 'hist-' + idx,
+                        text: m.content,
+                        sender: m.role === 'user' ? 'user' : 'ai',
+                        timestamp: new Date(m.timestamp)
+                    }));
+                    setMessages(formatted);
+                }
+            } catch (err) {
+                console.log("Could not load chat history:", err);
             }
-        }, 100); // 100ms per word
-    };
+        };
+        loadHistory();
+    }, []);
 
-    const handleSend = () => {
-        if (!inputValue.trim()) return;
+    const handleSendText = async (textToSend: string) => {
+        if (!textToSend.trim() || isThinking) return;
 
+        const userMsgText = textToSend.trim();
+        const userMsgId = Date.now().toString() + '-user';
         const newUserMessage: Message = {
-            id: Date.now().toString(),
-            text: inputValue.trim(),
+            id: userMsgId,
+            text: userMsgText,
             sender: 'user',
             timestamp: new Date()
         };
@@ -77,10 +65,83 @@ const MamaAIChat = () => {
         setInputValue('');
         setIsThinking(true);
 
-        // Trigger SSE simulation after a brief delay
-        setTimeout(() => {
-            simulateSSE();
-        }, 1500);
+        const aiMessageId = (Date.now() + 1).toString() + '-ai';
+
+        try {
+            const token = localStorage.getItem('access_token');
+            const response = await fetch(`${API_BASE}/api/chat/chat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : ''
+                },
+                body: JSON.stringify({ message: userMsgText })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || `Server error (${response.status})`);
+            }
+
+            if (!response.body) {
+                throw new Error("No ReadableStream in response");
+            }
+
+            setIsThinking(false);
+
+            setMessages(prev => [
+                ...prev,
+                {
+                    id: aiMessageId,
+                    text: '',
+                    sender: 'ai',
+                    timestamp: new Date(),
+                    isStreaming: true
+                }
+            ]);
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder('utf-8');
+            let done = false;
+
+            while (!done) {
+                const { value, done: readerDone } = await reader.read();
+                done = readerDone;
+                if (value) {
+                    const chunkText = decoder.decode(value, { stream: true });
+                    setMessages(prev =>
+                        prev.map(msg =>
+                            msg.id === aiMessageId
+                                ? { ...msg, text: msg.text + chunkText }
+                                : msg
+                        )
+                    );
+                    scrollToBottom();
+                }
+            }
+
+            setMessages(prev =>
+                prev.map(msg =>
+                    msg.id === aiMessageId ? { ...msg, isStreaming: false } : msg
+                )
+            );
+        } catch (error: any) {
+            console.error("MamaAI Chat error:", error);
+            setIsThinking(false);
+            setMessages(prev => [
+                ...prev,
+                {
+                    id: aiMessageId,
+                    text: "I'm having a little trouble connecting right now. Please make sure you are logged in and try again! 🌸",
+                    sender: 'ai',
+                    timestamp: new Date()
+                }
+            ]);
+        }
+    };
+
+    const handleSend = () => {
+        handleSendText(inputValue);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -98,24 +159,7 @@ const MamaAIChat = () => {
     ];
 
     const handleQuickReply = (reply: string) => {
-        setInputValue(reply);
-        // We need to set state and then immediately trigger send. 
-        // Best way is to directly trigger the send logic with the reply text.
-        
-        const newUserMessage: Message = {
-            id: Date.now().toString(),
-            text: reply,
-            sender: 'user',
-            timestamp: new Date()
-        };
-
-        setMessages(prev => [...prev, newUserMessage]);
-        setInputValue('');
-        setIsThinking(true);
-
-        setTimeout(() => {
-            simulateSSE();
-        }, 1500);
+        handleSendText(reply);
     };
 
     return (

@@ -17,8 +17,12 @@ def generate_and_send(email: str) -> None:
     expires_at = datetime.utcnow() + timedelta(minutes=OTP_EXPIRY_MINUTES)
     _otp_store[email] = {"code": code, "expires_at": expires_at}
 
-    _send_otp_email(email, code)
-    print(f"[OTP] Sent code {code} to {email} (expires {expires_at})")
+    try:
+        _send_otp_email(email, code)
+        print(f"[OTP] Sent code {code} to {email} (expires {expires_at})")
+    except Exception as e:
+        print(f"⚠️ [OTP Email Error]: {e}")
+        print(f"👉 [DEV OTP FALLBACK]: Your OTP code for {email} is: {code}")
 
 
 def verify(email: str, code: str) -> bool:

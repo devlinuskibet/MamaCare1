@@ -59,3 +59,7 @@ langchain-core
 langchain-openai
 langgraph
 langsmith
+
+# ---------------- AUTH & PDF ----------------
+google-auth
+fpdf2

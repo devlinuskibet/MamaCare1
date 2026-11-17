@@ -19,6 +19,9 @@ interface AuthContextType {
     verifyOtp: (code: string) => Promise<string>;
 }
 
+const rawApiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+const API_BASE = rawApiUrl.replace(/\/api\/?$/, '');
+
 const UserContext = createContext<AuthContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
@@ -46,7 +49,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     const login = async (credentials: LoginCredentials): Promise<string> => {
         try {
-            const response = await fetch('http://localhost:8000/api/auth/login', {
+            const response = await fetch(`${API_BASE}/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: credentials.username, password: credentials.password })
@@ -66,7 +69,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const googleLogin = async (idToken: string): Promise<string> => {
-        const response = await fetch('http://localhost:8000/api/auth/google', {
+        const response = await fetch(`${API_BASE}/api/auth/google`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id_token: idToken })
@@ -98,7 +101,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     const verifyOtp = async (code: string): Promise<string> => {
         if (!pendingOtpEmail) throw new Error('No pending OTP session.');
-        const response = await fetch('http://localhost:8000/api/auth/verify-otp', {
+        const response = await fetch(`${API_BASE}/api/auth/verify-otp`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: pendingOtpEmail, otp_code: code })

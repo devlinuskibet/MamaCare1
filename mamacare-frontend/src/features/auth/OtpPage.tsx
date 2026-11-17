@@ -16,6 +16,9 @@ const OtpPage = () => {
 
     // Start 60s cooldown on mount
     useEffect(() => {
+        // Only redirect to login if there is no pending email on initial mount
+        // Do not put pendingOtpEmail in the dependency array to avoid race conditions
+        // when verifyOtp succeeds and clears the email.
         if (!pendingOtpEmail) {
             navigate('/login');
             return;
@@ -27,7 +30,7 @@ const OtpPage = () => {
             });
         }, 1000);
         return () => clearInterval(timer);
-    }, [pendingOtpEmail, navigate]);
+    }, [navigate]);
 
     const handleDigitChange = (index: number, value: string) => {
         if (!/^\d?$/.test(value)) return; // only digits
